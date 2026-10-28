@@ -1,0 +1,35 @@
+{
+  "_about": "Shared readiness items. A guide's to-do that matches one of these uses its sharedId, so finishing it once counts for every guide. Hours and waits are estimates (ranges) unless a guide's evidence says otherwise. tier feeds the difficulty rule: basic=Easy, paperwork=Moderate, costly=Hard, relationship=Gated.",
+  "items": [
+    { "id": "company_domain", "level": "company", "label": "A domain you control", "tier": "basic", "hours": [0.25, 1], "valueLabel": "Domain", "valuePlaceholder": "yourcompany.com", "check": "dns" },
+    { "id": "business_email", "level": "company", "label": "Business email on your domain", "tier": "basic", "hours": [0.25, 1] },
+    { "id": "homepage", "level": "company", "label": "Public homepage that describes the app", "tier": "paperwork", "hours": [2, 6], "valueLabel": "Homepage URL", "valuePlaceholder": "https://yourcompany.com", "check": "url" },
+    { "id": "privacy_policy", "level": "company", "label": "Privacy policy page", "tier": "paperwork", "hours": [1, 3], "valueLabel": "Privacy policy URL", "valuePlaceholder": "https://yourcompany.com/privacy", "check": "url" },
+    { "id": "terms_of_service", "level": "company", "label": "Terms of service page", "tier": "paperwork", "hours": [1, 2], "valueLabel": "Terms URL", "valuePlaceholder": "https://yourcompany.com/terms", "check": "url" },
+    { "id": "support_contact", "level": "company", "label": "Support email or page", "tier": "basic", "hours": [0.25, 0.5], "valueLabel": "Support contact", "valuePlaceholder": "support@yourcompany.com" },
+    { "id": "app_logo", "level": "company", "label": "App logo (square, high resolution)", "tier": "basic", "hours": [0.5, 2] },
+    { "id": "registered_business", "level": "company", "label": "Registered legal entity", "tier": "paperwork", "blocking": true, "valueLabel": "Legal name", "valuePlaceholder": "Your Company Ltd", "note": "If you do not have one, paths that need it are closed to you until you do; registering takes days to weeks depending on the country." },
+    { "id": "security_audit", "level": "company", "label": "Recent security audit (SOC 2 Type II or ISO 27001)", "tier": "costly", "expiresMonths": 12, "accelerator": true, "note": "Not required by any provider here, but it shortens security assessments such as Google CASA." },
+    { "id": "composio_custom_callback", "level": "company", "label": "Composio callback on your own domain (white-label redirect)", "tier": "paperwork", "hours": [1, 3], "note": "Needed when a provider must verify every domain in your redirect URI (Google)." },
+
+    { "id": "google_cloud_project", "level": "provider", "provider": "Google", "label": "Google Cloud project with OAuth consent screen", "tier": "basic", "hours": [0.5, 1] },
+    { "id": "google_domain_verified", "level": "provider", "provider": "Google", "label": "Domains verified in Google Search Console", "tier": "paperwork", "hours": [0.25, 1], "waitDays": [0, 2] },
+    { "id": "google_brand_verified", "level": "provider", "provider": "Google", "label": "Google brand verification", "tier": "paperwork", "hours": [0.5, 1], "waitDays": [0, 3] },
+    { "id": "google_casa", "level": "provider", "provider": "Google", "label": "CASA Letter of Validation (restricted scopes)", "tier": "costly", "hours": [16, 40], "waitDays": [5, 20], "expiresMonths": 12, "fasterWith": { "id": "security_audit", "hours": [8, 16], "waitDays": [3, 7] } },
+
+    { "id": "microsoft_tenant", "level": "provider", "provider": "Microsoft", "label": "Microsoft Entra tenant with a work account", "tier": "basic", "hours": [0.25, 0.5] },
+    { "id": "microsoft_partner_center", "level": "provider", "provider": "Microsoft", "label": "Verified Microsoft AI Cloud Partner Program account", "tier": "paperwork", "hours": [1, 2], "waitDays": [3, 7] },
+    { "id": "microsoft_publisher_verified", "level": "provider", "provider": "Microsoft", "label": "Microsoft publisher verification", "tier": "paperwork", "hours": [0.5, 1], "waitDays": [0, 1] },
+
+    { "id": "linkedin_company_page", "level": "provider", "provider": "LinkedIn", "label": "LinkedIn Company Page you administer", "tier": "basic", "hours": [0.5, 1] },
+
+    { "id": "slack_dev_workspace", "level": "provider", "provider": "Slack", "label": "Slack workspace where you can install apps", "tier": "basic", "hours": [0.1, 0.25] },
+    { "id": "slack_ten_workspaces", "level": "provider", "provider": "Slack", "label": "App active on 10+ Slack workspaces", "tier": "costly", "note": "Depends on your customers; there is no fixed time." },
+
+    { "id": "github_org", "level": "provider", "provider": "GitHub", "label": "GitHub organisation to own the app", "tier": "basic", "hours": [0.1, 0.25] },
+    { "id": "notion_workspace_owner", "level": "provider", "provider": "Notion", "label": "Notion workspace where you are an owner", "tier": "basic", "hours": [0.1, 0.25] },
+
+    { "id": "microsoft_app_registration", "level": "provider", "provider": "Microsoft", "label": "Microsoft Entra app registration for your product", "tier": "basic", "hours": [0.25, 0.5] },
+    { "id": "atlassian_dev_app", "level": "provider", "provider": "Atlassian", "label": "Atlassian developer console app (OAuth 2.0 3LO)", "tier": "basic", "hours": [0.25, 0.5] }
+  ]
+}

@@ -1,0 +1,958 @@
+{
+  "slug": "linkedin",
+  "name": "LinkedIn",
+  "website": "https://www.linkedin.com/developers/",
+  "category": "Social media",
+  "summary": "Signing in and posting as the member are self-serve with no review and no user cap, so a basic 'post for me' agent works in under an hour. Anything involving Company Pages, comments or analytics needs a separate app, a registered legal entity and two rounds of Community Management API review. Reading a member's feed or posts, connections and messages is closed to almost everyone.",
+  "lastVerified": "2026-10-27",
+  "origin": "curated",
+  "verdict": {
+    "difficulty": "Gated",
+    "difficultyReason": "Only three open scopes exist (openid/profile/email and w_member_social). Company Page posting, comments and analytics need Community Management API approval (registered legal organisation, business email, Page super admin verification, then a Standard tier screencast review), which LinkedIn grants at its discretion. Member feed, connections and messaging are closed to most developers, and refresh tokens are for approved partners only.",
+    "milestones": [
+      {
+        "id": "test",
+        "label": "Self-serve: sign in and post as the member",
+        "activeEffort": "30-60 min",
+        "calendarWait": "None",
+        "approvalRequired": false,
+        "whatYouGet": "Client ID/secret with openid, profile, email and w_member_social: the agent can read the member's name, photo and email and create, comment on, like and delete the member's own posts, including image and video.",
+        "limits": "No user cap and no review, so this is also production for member-only posting. 60-day access tokens and no refresh token, so users must reconnect. Share rate limits: 150 requests per member per day, 100,000 per app per day. You cannot list the member's posts or feed afterwards.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            4,
+            2,
+            3,
+            0
+          ],
+          "note": "Open permissions need no approval per Getting Access; effort estimate is unverified."
+        },
+        "notes": "Waiting: None (Page admin verification is minutes if you are the admin)."
+      },
+      {
+        "id": "production",
+        "label": "Company Pages and engagement (Community Management API Standard tier)",
+        "activeEffort": "1-3 days, plus the build",
+        "calendarWait": "3-10 weeks (estimate)",
+        "approvalRequired": true,
+        "approvalName": "Community Management API: Development tier access, then Standard tier upgrade",
+        "whatYouGet": "Organisation scopes (posting as a Page, reading Page posts, comments, mentions and Page analytics for Pages the user administers) without the Development tier's call caps, batch block and webhook block.",
+        "limits": "Development tier: 500 calls per app and 100 per member per 24 h, no BATCH_GET, no webhooks, integration must be finished within 12 months. Marketing data rules apply at both tiers: most profile data may be stored for 24 h and social activity for 48 h, with no export or combining.",
+        "evidence": {
+          "level": "unverified",
+          "sourceIds": [
+            5,
+            6,
+            10,
+            9
+          ],
+          "note": "Development tier limits match LinkedIn's docs; hands-on time and the 3-10 week wait are our estimates (LinkedIn publishes no timeline for Community Management reviews; Ads API Standard is 'up to 30 business days' per the Partner Support Guide). Data storage limits are stated for member data under the Marketing API terms."
+        },
+        "notes": "Hands-on: 1-3 days of forms and recording, plus building the full integration. Waiting: No published SLA. Estimate 3-10 weeks across Development and Standard tier reviews; vendors report anywhere from 1-2 weeks to several months, and rejection is possible."
+      }
+    ],
+    "topBlockers": [
+      {
+        "title": "Reading member content is closed",
+        "detail": "LinkedIn lists r_member_social (reading the member's own posts, comments and reactions) as a closed permission that is not accepting access requests due to resource constraints. Connections and Messages APIs are restricted to approved partners. So in practice an agent can post as the member but cannot read their feed, inbox or network (our reading of the available products).",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            13,
+            11,
+            12
+          ],
+          "note": "The r_member_social statement comes from a 2024-07 versioned page; Upload-Post (Sep 2026) reports it is still closed [17]."
+        }
+      },
+      {
+        "title": "Company Page features need a registered legal entity",
+        "detail": "Community Management API is only for registered legal organisations with commercial use cases. Personal email addresses fail vetting, and the request must be verified by a super admin of the associated LinkedIn Page.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            5
+          ]
+        }
+      },
+      {
+        "title": "Separate app required for Community Management",
+        "detail": "Development tier must be requested from a new app with no other API products, so it cannot sit on the same app as Share on LinkedIn or Sign In at first. Ads API holders use a throwaway verification app, then add Standard tier to the original app.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            8
+          ],
+          "note": "LinkedIn says 'no other API product'; that this excludes Share on LinkedIn and Sign In is our reading."
+        }
+      },
+      {
+        "title": "No refresh tokens for most apps",
+        "detail": "Access tokens last 60 days. Programmatic refresh tokens (365-day fixed TTL) go only to approved Marketing Developer Platform partners, so self-serve users must reconnect every 60 days.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            0,
+            1
+          ]
+        }
+      },
+      {
+        "title": "Standard tier is discretionary and evidence-heavy",
+        "detail": "Standard tier needs a finished integration, test credentials for reviewers, a privacy policy and a screen recording (narration recommended) for each use case. LinkedIn can decline even when the minimum requirements are met. If you are rejected you cannot reapply from the same app.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            5,
+            6
+          ]
+        }
+      }
+    ]
+  },
+  "composio": {
+    "toolkitSlug": "linkedin",
+    "managedAuth": "yes",
+    "meanwhile": "Build and demo on Composio's managed LinkedIn app while you set up your own. Composio warns that the shared app hits 429 rate limits and shows Composio on the consent screen. Once your own app exists, member posting tools (LINKEDIN_CREATE_LINKED_IN_POST, LINKEDIN_CREATE_COMMENT_ON_POST, LINKEDIN_GET_MY_INFO) work with self-serve scopes. Organisation tools (LINKEDIN_GET_ORG_PAGE_STATS, posting as urn:li:organization) and ad-targeting tools need gated products.",
+    "redirectUriNote": "Copy the exact redirect URI the Composio dashboard shows when you create the auth config. On 29 Oct 2026 the dashboard showed https://backend.composio.dev/api/v1/auth-apps/add; some Composio docs show https://backend.composio.dev/api/v3/toolkits/auth/callback. It must match exactly, and you can change it in the dashboard to white-label the callback on your own domain. Paste it under Auth tab > OAuth 2.0 settings > Authorized redirect URLs. LinkedIn requires an exact, absolute HTTPS match.",
+    "evidence": {
+      "level": "reported",
+      "sourceIds": [
+        16,
+        15,
+        0
+      ],
+      "note": "Managed auth status comes from Composio's own docs. The redirect rules are sourced from LinkedIn [0]. The redirect URI value is what the Composio dashboard showed for GitHub and Gmail auth configs in our 29 Oct 2026 hands-on test; we did not create a LinkedIn auth config."
+    }
+  },
+  "prerequisites": [
+    {
+      "item": "A LinkedIn member account",
+      "detail": "Used to sign in to the Developer Portal. The account becomes the app's admin.",
+      "owner": "you",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          20
+        ]
+      }
+    },
+    {
+      "item": "A LinkedIn Company Page you administer, or a super admin who will approve",
+      "detail": "Every app is associated with a Page, and a Page admin must verify it. Community Management requests also need verification by a Page super admin.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5,
+          7
+        ],
+        "note": "Page super admin verification is sourced for Community Management [5]. The general verify step is reported [20]."
+      }
+    },
+    {
+      "item": "Composio project and the redirect URI shown in its dashboard",
+      "detail": "Create Auth Config > LinkedIn > OAuth2 shows the callback URL to register.",
+      "owner": "agent",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          15
+        ]
+      }
+    },
+    {
+      "item": "For Company Page features: registered legal entity, business-domain email, matching website, privacy policy",
+      "detail": "The application asks for the organisation's legal name, registered address, website and privacy policy, plus a verified business email. Personal emails fail vetting.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5
+        ]
+      }
+    },
+    {
+      "item": "For Standard tier: a working product, reviewer test credentials and a screencast",
+      "detail": "Reviewers must be able to log in and see each use case in action.",
+      "owner": "agent_assist",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "milestone": "test",
+      "title": "Create or confirm the Company Page",
+      "detail": "Apps must be associated with a LinkedIn Page. If your company has none, create one. You need admin rights or a super admin who will approve the app.",
+      "owner": "you",
+      "agentHelp": "Check whether the company already has a Page and who its super admins are; draft the Page name, tagline and logo specs.",
+      "estTime": "5-15 min",
+      "url": "https://www.linkedin.com/company/setup/new/",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          7
+        ],
+        "note": "Quick Start lists creating a Page as step one."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create the developer app",
+      "detail": "Developer Portal > My Apps > Create app. Enter the app name, the LinkedIn Page URL, a privacy policy URL and a logo, then accept the API Terms of Use. Users see the name and logo on the consent screen.",
+      "owner": "you",
+      "agentHelp": "Prepare the app name, a 100x100+ logo file and the privacy policy URL, and pre-check the Page URL.",
+      "estTime": "5 min",
+      "url": "https://www.linkedin.com/developers/apps/new",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          20,
+          15
+        ]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Verify the app with the Page",
+      "detail": "App > Settings tab > Verify > Generate URL. A Page admin opens the link while signed in and approves. Then click 'I'm done'. If you are not the admin, send them the link.",
+      "owner": "you",
+      "agentHelp": "Draft the message to the Page admin explaining what they are approving and why.",
+      "estTime": "5 min plus admin response",
+      "url": "https://www.linkedin.com/developers/apps",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          20
+        ],
+        "note": "LinkedIn's help article on this flow blocks automated fetching, so this step is not sourced."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Add the self-serve products",
+      "detail": "Products tab: request 'Sign In with LinkedIn using OpenID Connect' (openid, profile, email) and 'Share on LinkedIn' (w_member_social). Both are open permissions that need no review.",
+      "owner": "you",
+      "agentHelp": "Confirm on the Auth tab that the scopes listed under 'OAuth 2.0 scopes' are exactly openid, profile, email and w_member_social.",
+      "estTime": "2 min",
+      "url": "https://www.linkedin.com/developers/apps",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          4,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Register the redirect URL and copy credentials",
+      "detail": "Auth tab > OAuth 2.0 settings > Authorized redirect URLs: paste the exact URI from the Composio dashboard. Copy the Client ID and Primary Client Secret, and keep the secret server-side.",
+      "owner": "agent_assist",
+      "agentHelp": "Fetch the callback URI from the Composio dashboard and check that it is absolute HTTPS with no fragment before you paste it.",
+      "estTime": "3 min",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create the Composio custom auth config",
+      "detail": "Composio dashboard > Create Auth Config > LinkedIn > OAuth2 > tick 'Use your own developer authentication', then paste the Client ID and secret. In Manage Auth Config, set scopes to openid profile email w_member_social only. Any scope not enabled on the app fails the whole authorisation.",
+      "owner": "agent_assist",
+      "agentHelp": "Diff Composio's default scopes against the app's Auth tab and remove any organisation or ads scopes; store the ac_ ID in your secret manager.",
+      "estTime": "5 min",
+      "url": "https://dashboard.composio.dev/",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ],
+        "note": "Scope errors are sourced from LinkedIn. The Composio dashboard steps are reported from Composio's guide [15]."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Connect and post a test",
+      "detail": "Connect your own account, run LINKEDIN_GET_MY_INFO, then LINKEDIN_CREATE_LINKED_IN_POST with author urn:li:person:{id}. Save the returned post URN, because the API cannot list the member's posts later.",
+      "owner": "agent",
+      "agentHelp": "Run the connect flow, post with CONNECTIONS visibility first, delete it afterwards, and log the URN.",
+      "estTime": "10 min",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          3,
+          13
+        ],
+        "note": "Saving URNs follows from r_member_social being closed."
+      }
+    }
+  ],
+  "nuances": [
+    {
+      "title": "60-day tokens, no refresh",
+      "detail": "Every access token lasts 60 days and authorisation codes last 30 minutes. Without partner refresh tokens, reauthorising skips the consent screen only if the member is still signed in and the old token has not expired, so prompt users to reconnect before day 60.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "title": "Changing scopes logs everyone out",
+      "detail": "Members must accept all requested scopes, and requesting a different scope set invalidates their previous tokens. Lock the scope list before launch.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ]
+      }
+    },
+    {
+      "title": "Write-only on personal profiles",
+      "detail": "w_member_social posts, comments and likes. There is no open API for the member's feed, their own past posts, personal post analytics, connections (count or list) or messages.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          4,
+          13,
+          11,
+          12
+        ],
+        "note": "Personal post analytics now exist for selected partner tools such as Hootsuite and Buffer (Jul 2025 news), not as an open product."
+      }
+    },
+    {
+      "title": "Data retention limits affect agent memory",
+      "detail": "Under the Marketing API terms, most member profile data may be stored for 24 h and social activity data for 48 h. Member data may not be exported, combined with other data or used for sales, recruiting or ads. Do not put it into long-term memory or vector stores.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          10
+        ]
+      }
+    },
+    {
+      "title": "Docs still show legacy scope names",
+      "detail": "The OAuth flow page's examples still use liteprofile/emailaddress. Use openid, profile and email from the OpenID Connect product. The ID token is RS256-signed, and email may be absent.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "title": "Share on LinkedIn rate limits",
+      "detail": "150 requests per member per day and 100,000 per app per day (UTC). An agent posting in loops will hit the member cap fast.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          3
+        ]
+      }
+    },
+    {
+      "title": "Marketing API version sunset",
+      "detail": "Marketing version 202511 sunsets on 16 Nov 2026. If you call Community Management endpoints directly, pin a current Linkedin-Version header.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "title": "EEA-only self-serve read path",
+      "detail": "The Member Data Portability (Member) API (r_dma_portability_self_serve) is self-serve but works only for members in the EEA or Switzerland, for their own data, via a token generator. It is not a multi-user product path.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14
+        ]
+      }
+    }
+  ],
+  "whenStuck": [
+    {
+      "symptom": "401 'Invalid scope' or unauthorized_scope_error on the consent screen",
+      "fix": "Remove every scope in the Composio auth config that is not listed on the app's Auth tab. One unapproved scope fails the whole request.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ]
+      }
+    },
+    {
+      "symptom": "'Redirect_uri doesn't match' or invalid_redirect_uri at token exchange",
+      "fix": "Paste Composio's exact callback (as shown in the dashboard) into Authorized redirect URLs. It must be absolute HTTPS with no fragment; query strings are ignored. Also check the code was used within 30 minutes.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ]
+      }
+    },
+    {
+      "symptom": "Community Management API option is greyed out",
+      "fix": "Request it from a brand-new app with no other products, verified with the same Page.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          8
+        ]
+      }
+    },
+    {
+      "symptom": "403 when listing the member's posts or personal post stats",
+      "fix": "This is expected: r_member_social is closed. Store post URNs when you create posts, and use organisation analytics only for Pages under Community Management.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          13
+        ],
+        "note": "403 symptom reported on Make community (Dec 2025)."
+      }
+    },
+    {
+      "symptom": "Access request rejected",
+      "fix": "You cannot reapply from the same app. Fix the gaps against the review criteria, create a new app, and resubmit. For identity-vetting denials, file a Vetting Appeal via the Developer Support contact form with your client ID.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5,
+          9
+        ]
+      }
+    },
+    {
+      "symptom": "Users' connections stop working after about two months",
+      "fix": "The 60-day access tokens have expired and there is no refresh token. Trigger a reconnect, ideally before expiry so consent is skipped.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ]
+      }
+    }
+  ],
+  "openQuestions": [
+    "Which scopes Composio's managed LinkedIn app grants, and whether it includes organisation scopes; confirm by connecting via managed auth and inspecting the token's scopes, or by asking Composio support.",
+    "Composio's default scope list for a custom LinkedIn auth config; confirm in Manage Auth Config before the first connect.",
+    "Real Community Management Development and Standard tier review durations (no SLA is published); confirm by asking in a Developer Support ticket after submission.",
+    "Exact organisation scope names granted at Development tier (for example w_organization_social, r_organization_social, rw_organization_admin); confirm on the Auth tab after approval.",
+    "Whether the Page verification link expires and whether a non-super admin can approve; confirm in the app's Settings tab and with the Page admin.",
+    "Units of expires_in and refresh_token_expires_in on the refresh token page (the samples contradict the stated TTLs); confirm only if you become a Marketing Developer Platform partner.",
+    "Whether a member-scoped Community Management use case (Executive Management or Employee Advocacy) unlocks member post analytics for a new applicant; confirm via the Community Management application form or Developer Support."
+  ],
+  "sources": [
+    {
+      "title": "LinkedIn: Authorization Code Flow (3-legged OAuth) (updated 2025-11-17)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Programmatic Refresh Tokens (updated 2025-05-31)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/authentication/programmatic-refresh-tokens",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Sign In with LinkedIn using OpenID Connect (updated 2025-02-05)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin-v2",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Share on LinkedIn (updated 2025-02-05)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/share-on-linkedin",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Getting Access to LinkedIn APIs (updated 2025-06-26)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/authentication/getting-access",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Community Management App Review (updated 2026-02-11)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management-app-review",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Increasing Access (Development vs Standard tiers) (updated 2026-10-19)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn Marketing API: Quick Start (updated 2026-08-17)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/quick-start",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Community Management API Migration guide and FAQ (updated 2026-05-15)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-api-migration-guide",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn API Partner Support Guide (updated 2026-05-18)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/linkedin-api-partner-support-guide",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Restricted Uses of Marketing APIs and Data (updated 2025-08-29)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/restricted-use-cases",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Messages API (restricted to approved partners)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/integrations/communications/messages",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Connections API (restricted to approved developers)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/shared/integrations/people/connections-api",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Community Management Overview, FAQ on r_member_social (li-lms-2024-07 view)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview?view=li-lms-2024-07",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Member Data Portability (Member) API, EEA/CH only (updated 2026-04-15)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/dma/member-data-portability/member-data-portability-member",
+      "type": "official",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "Composio: How to create OAuth2 config for LinkedIn",
+      "url": "https://composio.dev/auth/linkedin",
+      "type": "composio",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "Composio docs: LinkedIn toolkit (managed OAuth: yes; 25 tools)",
+      "url": "https://docs.composio.dev/toolkits/linkedin",
+      "type": "composio",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "Upload-Post: LinkedIn API developer guide (checked Sep 2026, vendor)",
+      "url": "https://www.upload-post.com/linkedin-api/",
+      "type": "community",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "Phyllo: LinkedIn API access in 2026, approval timelines (Jun-Aug 2026, vendor)",
+      "url": "https://www.getphyllo.com/post/linkedin-api-access-in-2026-partner-program-approval-timeline-alternatives",
+      "type": "community",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "Postproxy: Automate LinkedIn Company Page posts (Mar 2026, vendor)",
+      "url": "https://postproxy.dev/blog/linkedin-api-automate-company-page-publishing/",
+      "type": "community",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "JC Chouinard: LinkedIn API OAuth credentials (modified Apr 2025)",
+      "url": "https://www.jcchouinard.com/linkedin-api-oauth-credentials",
+      "type": "community",
+      "accessed": "2026-10-27"
+    },
+    {
+      "title": "LinkedIn: Community Management Overview, FAQ on r_member_social (li-lms-2026-05 view)",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview?view=li-lms-2026-05",
+      "type": "official",
+      "accessed": "2026-10-27"
+    }
+  ],
+  "defaultUseCase": "sign-in-and-post",
+  "useCases": [
+    {
+      "id": "sign-in-and-post",
+      "label": "Sign in and post as the member",
+      "summary": "Sign In with LinkedIn using OpenID Connect and Share on LinkedIn are open permissions with no review and no user cap, so the test setup is already production. The remaining work is handling 60-day tokens with no refresh token.",
+      "scopes": [
+        "openid",
+        "profile",
+        "email",
+        "w_member_social"
+      ],
+      "gate": "none",
+      "todoIds": [
+        "company-page",
+        "app-logo",
+        "decide-company-features",
+        "reconnect-flow"
+      ],
+      "customerApproval": {
+        "likelihood": "none",
+        "who": "Each member consents for themselves",
+        "detail": "Members authorise the app individually on the consent screen; there is no organisation admin step for member-only posting."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          4,
+          2,
+          3,
+          0
+        ],
+        "note": "Open permissions need no approval per Getting Access. That no org admin step applies is our reading (unverified)."
+      }
+    },
+    {
+      "id": "company-pages",
+      "label": "Manage Company Page posts and comments",
+      "summary": "Posting as a Page, reading Page posts and comments, and Page analytics need the Community Management API on a separate app: a registered legal organisation, business email and Page super admin verification for Development tier, then a Standard tier review with a screen recording per use case. LinkedIn can decline even when the minimum requirements are met.",
+      "scopes": [
+        "w_organization_social",
+        "r_organization_social",
+        "rw_organization_admin"
+      ],
+      "gate": "discretionary",
+      "gateName": "Community Management API: Development tier access, then Standard tier upgrade",
+      "todoIds": [
+        "registered-business",
+        "business-email",
+        "homepage",
+        "privacy-policy",
+        "company-page",
+        "app-logo",
+        "decide-company-features",
+        "cm-new-app",
+        "cm-development-tier",
+        "cm-vetting-survey",
+        "cm-standard-tier",
+        "cm-switch-scopes",
+        "reconnect-flow"
+      ],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "A super admin of each customer's Company Page",
+        "detail": "The agent can only act on Pages the connecting member administers. If that member lacks a Page admin role, a Page super admin has to grant it first."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5,
+          6,
+          8
+        ],
+        "note": "Eligibility, separate-app rule and the discretion clause are from LinkedIn docs. The organisation scope names are examples to confirm on the Auth tab after approval (see open questions); the customer Page-role detail is our reading (unverified)."
+      }
+    },
+    {
+      "id": "read-member-content",
+      "label": "Read the member's feed, posts, inbox or network",
+      "summary": "Reading the member's own posts, comments and reactions needs r_member_social, which LinkedIn has closed. The Connections and Messages APIs are restricted to approved partners or developers, so an agent can post as the member but cannot read their feed, inbox or network (our inference from the available products).",
+      "scopes": [
+        "r_member_social"
+      ],
+      "gate": "not_available",
+      "notAvailableReason": "LinkedIn calls r_member_social 'a closed permission' that is 'not accepting access requests at this time due to resource constraints'. The Messages API is restricted to approved partners and the Connections API to approved developers.",
+      "todoIds": [],
+      "customerApproval": {
+        "likelihood": "none"
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          21,
+          13,
+          11,
+          12
+        ],
+        "note": "Wording from the li-lms-2026-05 FAQ. The only self-serve read path, the Member Data Portability (Member) API, is for EEA/Swiss members' own data via a token generator, not a multi-user product [14]."
+      }
+    }
+  ],
+  "todos": [
+    {
+      "id": "registered-business",
+      "sharedId": "registered_business",
+      "title": "Registered legal organisation",
+      "detail": "Community Management API is only for registered legal organisations with commercial use cases. The form asks for the legal name and registered address.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Collect the exact legal name and registered address so they match the website and business email domain.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "business-email",
+      "sharedId": "business_email",
+      "title": "Verified business email",
+      "detail": "LinkedIn verifies a business email for the request and follows up there. Personal email addresses fail vetting.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Check the email domain matches the organisation's website; watch the inbox, including spam, for reviewer mail.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5,
+          9
+        ]
+      }
+    },
+    {
+      "id": "homepage",
+      "sharedId": "homepage",
+      "title": "Organisation website",
+      "detail": "The Community Management application asks for the organisation's website alongside its legal name and address.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "agentHelp": "Check the site names the legal entity and describes the product that will use LinkedIn data.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "privacy-policy",
+      "sharedId": "privacy_policy",
+      "title": "Privacy policy covering LinkedIn data",
+      "detail": "Required in the Development tier form and again for Standard tier review.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "agentHelp": "Audit the policy for LinkedIn data handling, including the 24 h / 48 h storage limits and no export or combining.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          5,
+          10
+        ]
+      }
+    },
+    {
+      "id": "company-page",
+      "sharedId": "linkedin_company_page",
+      "title": "LinkedIn Company Page the app is verified with",
+      "detail": "Every app is associated with a Page and verified by a Page admin. Community Management requests must also be verified by a super admin of that Page.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Check whether the company already has a Page and who its super admins are; draft the message asking them to verify.",
+      "url": "https://www.linkedin.com/company/setup/new/",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          7,
+          5
+        ],
+        "note": "Page super admin verification is sourced for Community Management [5]. The general verify step is reported [20]."
+      }
+    },
+    {
+      "id": "app-logo",
+      "sharedId": "app_logo",
+      "title": "App logo for the consent screen",
+      "detail": "Entered when you create the developer app (100x100 or larger); users see it with the app name on the consent screen. For Community Management, remove any LinkedIn or Microsoft names and logos from your app.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Check the logo file's size and that neither it nor the app name uses LinkedIn or Microsoft branding.",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          20,
+          15,
+          5
+        ],
+        "note": "The create-app form fields are reported [20, 15]; the branding rule is sourced [5]."
+      }
+    },
+    {
+      "id": "decide-company-features",
+      "title": "Decide whether you need Company Page features at all",
+      "detail": "If the agent only posts as the member, you are done: no review applies. Apply for Community Management only for Page posting, comments, mentions or analytics. Check the restricted use cases first: sales, recruiting, ad targeting, CRM enrichment and social feed widgets are not allowed.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.25,
+        0.75
+      ],
+      "agentHelp": "Map each planned agent action to a scope and flag any that fall under restricted uses or closed permissions.",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/restricted-use-cases",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          4,
+          10
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "reconnect-flow",
+      "title": "Build the 60-day reconnect flow",
+      "detail": "Access tokens last 60 days and refresh tokens go only to approved Marketing Developer Platform partners. Prompt users to reconnect before day 60, when re-authorisation can skip the consent screen if they are still signed in. Lock the scope list first: requesting a different scope set invalidates earlier tokens.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        1,
+        3
+      ],
+      "agentHelp": "Store each connection's issue date, schedule a reconnect prompt around day 50, and handle 401s by sending the user back through Composio's connect link.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "cm-new-app",
+      "title": "Create a new app for Community Management",
+      "detail": "Create a separate app with no other products, associated with the same Page, and verify it. The Community Management option is greyed out on apps that already have other API products.",
+      "owner": "you",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.15,
+        0.5
+      ],
+      "agentHelp": "Prepare the second app's name, logo and Page link; track both client IDs.",
+      "url": "https://www.linkedin.com/developers/apps/new",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          8
+        ],
+        "note": "LinkedIn says 'no other API product'; that this excludes Share on LinkedIn and Sign In is our reading. Hours are our estimate."
+      }
+    },
+    {
+      "id": "cm-development-tier",
+      "title": "Community Management Development tier request",
+      "detail": "Products tab > Community Management API. Provide your business email, the organisation's legal name, registered address, website and privacy policy. Verify the email and have a Page super admin verify the request. LinkedIn publishes no timeline for this decision. Once approved you get 500 calls per app and 100 per member per day, no BATCH_GET and no webhooks, and 12 months to finish the integration.",
+      "owner": "agent_assist",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [
+        1,
+        2
+      ],
+      "waitDays": [
+        7,
+        28
+      ],
+      "waitBasis": "estimate",
+      "agentHelp": "Draft the use-case description against LinkedIn's named use cases (Page Management, Brand Engagement, Page Analytics, Executive Management, Employee Advocacy). Open a Developer Support ticket with the client ID if there is no response.",
+      "url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management-app-review",
+      "evidence": {
+        "level": "unverified",
+        "sourceIds": [
+          5,
+          6,
+          19
+        ],
+        "note": "Form contents and Development tier limits are sourced [5, 6]. The 1-4 week wait and the hours are our estimates; Postproxy reports 1-2 weeks [19]."
+      }
+    },
+    {
+      "id": "cm-vetting-survey",
+      "title": "Complete the vetting survey within 21 days (if triggered)",
+      "detail": "If LinkedIn triggers a vetting survey, submit it within 21 days or the request is marked incomplete and may be closed. Reviewers follow up by business email.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "paperwork",
+      "hours": [
+        0.5,
+        1.5
+      ],
+      "optional": true,
+      "agentHelp": "Pre-draft answers on data use, storage and user base; watch the business inbox, including spam folders.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9
+        ],
+        "note": "Only needed if LinkedIn sends the survey. Hours are our estimate."
+      }
+    },
+    {
+      "id": "cm-standard-tier",
+      "title": "Community Management Standard tier review",
+      "detail": "Build the full integration first. Products tab > Community Management API > Standard tier form: company and product overview, use cases, reviewer test credentials, a privacy policy, and a high-resolution, downloadable screen recording (narration recommended) of each use case showing the OAuth consent, posting and display of comments and commenter fields. LinkedIn can decline even when minimum requirements are met, and you cannot reapply from the same app.",
+      "owner": "agent_assist",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [
+        4,
+        8
+      ],
+      "waitDays": [
+        14,
+        42
+      ],
+      "waitBasis": "estimate",
+      "agentHelp": "Write the screen recording script per use case from LinkedIn's checklist, create reviewer test accounts, and draft the form answers. A human records and submits.",
+      "evidence": {
+        "level": "unverified",
+        "sourceIds": [
+          5,
+          9
+        ],
+        "note": "Requirements and the discretion clause are sourced [5]. No Community Management SLA is published; the 2-6 week wait and the hours (excluding build time) are our estimates. The only official figure, up to 30 business days, is for the Ads API Standard upgrade [9]."
+      }
+    },
+    {
+      "id": "cm-switch-scopes",
+      "title": "Switch Composio scopes after Standard tier",
+      "detail": "When approved, add the organisation scopes shown on the Auth tab to the Composio auth config (or a second config for the Community Management app) and ask users to reconnect: changing scopes invalidates earlier tokens.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.25,
+        0.75
+      ],
+      "agentHelp": "Update the auth config scopes and send a reconnect prompt to users.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0
+        ],
+        "note": "Hours are our estimate."
+      }
+    }
+  ]
+}

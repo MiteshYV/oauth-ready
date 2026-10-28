@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+.env
+.env.local
+.env*.local
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+
+# Guides generated on this machine. The shipped example is listed below.
+data/generated/*
+!data/generated/hubspot.json
+
+# Written by Next.js 16 on dev/build
+AGENTS.md

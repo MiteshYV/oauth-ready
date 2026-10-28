@@ -1,0 +1,1296 @@
+{
+  "slug": "shopify",
+  "name": "Shopify",
+  "website": "https://www.shopify.com",
+  "category": "E-commerce",
+  "summary": "A Shopify app that works on your own development store takes under an hour, with no review. The hard part is reaching many merchants with one app: that needs public distribution, which means Shopify App Store review (even for unlisted apps), a protected customer data review if the agent reads names, emails or addresses, and expiring offline tokens. The no-review alternative is one custom app per merchant, which turns every new customer into a manual setup.",
+  "lastVerified": "2026-10-29",
+  "origin": "curated",
+  "verdict": {
+    "difficulty": "Hard",
+    "difficultyReason": "One app serving many merchants needs public distribution, and every public app (listed or unlisted) must pass Shopify's App Store review before it installs on a live store. Shopify publishes no timeline and the queue has been long in 2026. Agents that read orders or customers also need protected customer data approval. Composio has no managed Shopify app to ship on meanwhile.",
+    "milestones": [
+      {
+        "id": "test",
+        "label": "Working on your own development store",
+        "activeEffort": "30-60 min",
+        "calendarWait": "None",
+        "approvalRequired": false,
+        "whatYouGet": "A Dev Dashboard app with a Client ID and secret in a Composio custom auth config, connected to a development store you own. Protected customer data works on development stores as soon as you request it.",
+        "limits": "An unreviewed public app installs only on development stores in your own organisation. Development stores cannot process real transactions and are always password protected. Orders are limited to the last 60 days without read_all_orders.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            14,
+            6,
+            7,
+            25
+          ],
+          "note": "Effort is our estimate (unverified). That draft public apps install only on development stores is reported by Shopify staff on the community forum [26]."
+        },
+        "notes": "Hands-on: 30-60 min (create organisation and dev store, create the app, set scopes and redirect URL, connect through Composio). Waiting: none."
+      },
+      {
+        "id": "production",
+        "label": "Any merchant can install (approved public app)",
+        "activeEffort": "3-8 days",
+        "calendarWait": "1-8 weeks (reported)",
+        "approvalRequired": true,
+        "approvalName": "Shopify App Store review (required for public distribution, listed or unlisted); protected customer data review for orders and customers",
+        "whatYouGet": "One app, one Composio auth config, installable on any merchant's store through your install link or the App Store.",
+        "limits": "Expiring offline tokens are mandatory (1-hour access tokens, 90-day refresh tokens). GraphQL Admin API only for new public apps. Installs must start from Shopify, not from a shop-domain box. Charges must go through Shopify billing. Rate limits depend on each merchant's plan.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            0,
+            19,
+            9,
+            3,
+            6
+          ],
+          "note": "Requirements are from Shopify's docs. Shopify publishes no review duration; the wait range is from developer reports [24, 27] and our estimate. Active effort is our estimate (unverified)."
+        },
+        "notes": "Hands-on: 3-8 days (compliance webhooks, install flow that starts from Shopify, expiring-token handling, data protection details, listing content, screencast, test credentials). Waiting: no published SLA. Shopify said in Feb 2026 that review times are 'longer than usual'; developers report a first look after 18 days to 1-1.5 months, with fix rounds extending that. Alternative with no review: one custom-distribution app per merchant (see 'Who creates the OAuth app')."
+      },
+      {
+        "id": "listing",
+        "label": "Visible in Shopify App Store search",
+        "activeEffort": "2-6 hours",
+        "calendarWait": "None beyond app review",
+        "approvalRequired": true,
+        "approvalName": "Shopify App Store review (listing content included)",
+        "whatYouGet": "Discoverability in App Store search and categories, in addition to direct installs.",
+        "limits": "Listing visibility is a setting on an approved public app; unlisted apps are hidden from search and categories but go through the same review. Listing claims must avoid unsubstantiated statistics, and screenshots must show the real UI.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            19,
+            8,
+            9
+          ],
+          "note": "That a listed app needs no wait beyond the same review is our reading of Shopify's docs (unverified). Hours are our estimate."
+        },
+        "notes": "Hands-on: 2-6 h on top of production (listing copy, screenshots, icon, pricing). Waiting: none extra if submitted as listed; Shopify reviews listing content as part of app review."
+      }
+    ],
+    "topBlockers": [
+      {
+        "title": "Many merchants on one app means App Store review",
+        "detail": "Custom distribution is limited to one store, or several stores in the same Plus organisation, and needs no review. Anything wider needs public distribution, and public apps (including unlisted ones) must be approved before they install on live stores. Until then they install only on your development stores.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            0,
+            1,
+            19,
+            26,
+            29
+          ],
+          "note": "Distribution limits and listed/unlisted review are from Shopify docs; a Shopify staff reply confirms review is required even for unlisted apps [26]. That draft public apps install only on your own development stores is reported in community answers [29]; no official page we cited states it."
+        }
+      },
+      {
+        "title": "Without review, every merchant needs its own app",
+        "detail": "The no-review routes are a custom-distribution app you create per merchant, or an app the merchant creates in their own Dev Dashboard and hands you the Client ID and secret. Either way you get a separate client ID, secret and Composio auth config per customer, set up by hand. Shopify allows a custom app per merchant only when it is built for that merchant; cloning one app per store to dodge review breaches the Partner Program Agreement.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            1,
+            5,
+            18,
+            22
+          ],
+          "note": "One auth config per app follows from Composio auth configs holding one client ID and secret; that is our inference (unverified). The merchant-hands-you-credentials route is also our inference: Shopify's client credentials grant works only when the app and store are in the same organisation [5], and no Shopify page describes a merchant sharing its secret with a third party. Shopify staff say cloning custom apps to get round the one-store limit breaches the Partner Program Agreement [26]."
+        }
+      },
+      {
+        "title": "Orders and customers need protected customer data approval",
+        "detail": "Customer names, emails, phones and addresses (Level 2) and any customer-linked data (Level 1) need a request in the Partner Dashboard and Shopify's review for public apps. Until approved, the API returns no protected data from live stores. Level 2 also needs security controls such as access logs, encrypted backups and an incident response policy.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            6,
+            7
+          ],
+          "note": "Shopify publishes no timeline for this review; a Shopify staff member said they 'are unable to provide any estimated timeframes' but reviews are 'usually done pretty quickly' [25]."
+        }
+      },
+      {
+        "title": "Expiring offline tokens are mandatory for public apps",
+        "detail": "Public apps created since 1 Apr 2026 must use expiring offline tokens (expiring=1): 1-hour access tokens and 90-day rotating refresh tokens. All public apps must migrate by 1 Jan 2027; from 1 Apr 2027 non-expiring tokens get HTTP 403. Composio does not document whether it requests expiring=1.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [
+            3,
+            2,
+            17,
+            28
+          ],
+          "note": "Custom and merchant-created apps are excluded. Whether Composio's Shopify OAuth2 config sends expiring=1 and refreshes is unverified; see openQuestions."
+        }
+      },
+      {
+        "title": "No published review timeline, and the 2026 queue is slow",
+        "detail": "Shopify's review-process page gives no durations. In Feb 2026 Shopify posted that review times are 'longer than usual' and asked developers not to resubmit, because that moves them to the back of the queue.",
+        "evidence": {
+          "level": "reported",
+          "sourceIds": [
+            8,
+            24,
+            27
+          ],
+          "note": "The absence of a timeline is from Shopify's docs [8]. The slowdown is from community forum posts, apparently by Shopify staff (the author's role is not shown)."
+        }
+      }
+    ]
+  },
+  "composio": {
+    "toolkitSlug": "shopify",
+    "managedAuth": "no",
+    "meanwhile": "Composio has no managed Shopify app, so build and demo on your own Dev Dashboard app connected to a development store. To pilot with a real merchant before review, create a custom-distribution app for that merchant's store (no review), or have the merchant create an app in their own Dev Dashboard and connect it with Composio's S2S_OAUTH2 scheme (client credentials). Move to one public app after App Store approval.",
+    "redirectUriNote": "Copy the exact redirect URI the Composio dashboard shows when you create the auth config. On 29 Oct 2026 the dashboard showed https://backend.composio.dev/api/v1/auth-apps/add; some Composio docs show https://backend.composio.dev/api/v3/toolkits/auth/callback. It must match exactly, and you can change it in the dashboard to white-label the callback on your own domain. Paste it into the Redirect URLs of the app version in the Dev Dashboard (or [auth] redirect_urls in shopify.app.toml), then release the version. Shopify requires an exact match.",
+    "evidence": {
+      "level": "sourced",
+      "sourceIds": [
+        20,
+        21,
+        22,
+        23,
+        2
+      ],
+      "note": "Composio's own docs: the Shopify toolkit page says 'Composio-managed OAuth available? No' and lists OAUTH2 and S2S_OAUTH2; the managed-auth page lists Shopify under 'Bring your own OAuth app'. Composio's FAQ says the default Shopify OAuth app may be under review or expired, so a managed app may return; re-check. The redirect URI value is what the Composio dashboard showed for GitHub and Gmail auth configs in our 29 Oct 2026 hands-on test; we did not create a Shopify auth config."
+    }
+  },
+  "prerequisites": [
+    {
+      "item": "A Shopify Partner account or Dev Dashboard organisation",
+      "detail": "Dev stores and apps live in an organisation. You need a Partner account, or a merchant store with developer permissions, plus permission to create dev stores and apps.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14,
+          15
+        ],
+        "note": "Shopify charges a one-time $19 only when you register for the App Store [13]; we found no fee for the account itself."
+      }
+    },
+    {
+      "item": "A development store",
+      "detail": "Created in the Dev Dashboard under Stores. Up to 250 per organisation. Shopify now verifies your identity before installing apps on development stores.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14,
+          17
+        ]
+      }
+    },
+    {
+      "item": "Decide public or custom distribution before production",
+      "detail": "The choice is permanent per app. Public serves any merchant after review; custom serves one store or one Plus organisation with no review. Keep a separate development app so the production app's choice is deliberate.",
+      "owner": "agent_assist",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "item": "Composio project with access to Auth Configs",
+      "detail": "Needed to create the custom auth config (OAuth2 with your own developer credentials) and read its redirect URI.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          23
+        ],
+        "note": "Composio's own guide."
+      }
+    }
+  ],
+  "steps": [
+    {
+      "milestone": "test",
+      "title": "Create a development store",
+      "detail": "In the Dev Dashboard, go to Stores > Create store > Dev, choose a name (the myshopify.com URL cannot be changed later) and a plan, then Create store. Pick Plus if you want to test Plus-only behaviour.",
+      "owner": "you",
+      "agentHelp": "Generate sample products, customers and orders to load into the store so the agent's tools have data to work on.",
+      "estTime": "5 min",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14
+        ]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create the app in the Dev Dashboard",
+      "detail": "Click Create app and name it. Merchants can also reach the Dev Dashboard from their admin via App development > Build apps in Dev Dashboard. Apps created this way, not Partner Dashboard legacy apps, are where new custom and public apps now live.",
+      "owner": "you",
+      "agentHelp": "Draft shopify.app.toml (client_id, application_url, [access_scopes], [auth] redirect_urls) so the configuration is reproducible with Shopify CLI.",
+      "estTime": "5 min",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          23,
+          18,
+          2
+        ],
+        "note": "Click path from Composio's Shopify guide; 'custom apps are created in the Dev Dashboard' from Shopify Help Center."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Set scopes, App URL and the Composio redirect URL, then release",
+      "detail": "In the app version, set the App URL, the access scopes (e.g. write_products, write_inventory, read_orders, read_customers) and the Composio callback as the redirect URL. Click Release to make the version live; changes do nothing until released.",
+      "owner": "agent_assist",
+      "agentHelp": "Map each Composio Shopify tool you enable to its scope and output the minimal list. Write scopes include read access, so do not request both.",
+      "estTime": "10 min",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          23,
+          7,
+          2
+        ]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Request protected customer data access (orders and customers)",
+      "detail": "Select a distribution method first; Shopify requires it even for development stores. Then in the Partner Dashboard go to Apps > your app > API access requests > Protected customer data access > Request access, give reasons, and pick the fields (name, email, phone, address). It works on development stores immediately.",
+      "owner": "you",
+      "agentHelp": "Draft the per-field justification: which agent task needs each field and why less would not do.",
+      "estTime": "15 min",
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6,
+          16,
+          25
+        ],
+        "note": "Immediate use on development stores is from a Shopify staff forum reply [25] (reported). Shopify plans to move this request into the Dev Dashboard [16]."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create the Composio custom auth config",
+      "detail": "Copy the Client ID and Client Secret from the app's Settings page. In Composio, go to Create Auth Config > Shopify > OAuth2, tick 'Use your own developer credentials', paste both and the redirect URI, and save.",
+      "owner": "you",
+      "agentHelp": "Prepare the scope list and a checklist. Keep the client secret in a secret manager rather than pasting it into chat.",
+      "estTime": "5 min",
+      "url": "https://platform.composio.dev",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          23
+        ],
+        "note": "Composio's own guide."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Connect your development store and smoke-test",
+      "detail": "Click Connect Account, enter only the store subdomain (the part before .myshopify.com), install and approve in the Shopify window, and check the account shows Active. Then list products, adjust one inventory level and read a recent order.",
+      "owner": "you",
+      "agentHelp": "Write the smoke-test script with SHOPIFY_GRAPH_QL_QUERY and SHOPIFY_GET_ORDERS_WITH_FILTERS; fetch tools with a higher limit, since Composio returns 20 by default.",
+      "estTime": "10 min",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          23,
+          22
+        ],
+        "note": "Composio's own docs."
+      }
+    },
+    {
+      "milestone": "listing",
+      "title": "Register for the App Store and choose public distribution",
+      "detail": "Pay the one-time $19 registration per Partner account (waived for some older accounts). On the production app's Home, use Distribution > Select distribution method > Public. This cannot be changed later.",
+      "owner": "you",
+      "agentHelp": "Check the production app is not the one you test on, and list which settings must be copied from the development app.",
+      "estTime": "15 min",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          13,
+          1
+        ]
+      }
+    },
+    {
+      "milestone": "listing",
+      "title": "Meet the App Store requirements",
+      "detail": "Subscribe to and verify the three compliance webhooks, start OAuth immediately on install and send merchants to your app UI afterwards, use expiring offline tokens and only the GraphQL Admin API, and route any charges through Shopify billing.",
+      "owner": "agent_assist",
+      "agentHelp": "Implement the compliance webhook endpoints with HMAC checks (401 on failure), and audit the Composio tools you use for REST calls.",
+      "estTime": "2-5 days",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          10,
+          3
+        ]
+      }
+    },
+    {
+      "milestone": "listing",
+      "title": "Prepare the submission and listing",
+      "detail": "You need a demo screencast of onboarding and features, test credentials that unlock every feature, an emergency developer contact, data protection details, and listing content with real screenshots. Review starts only when every requirement on the review page is met.",
+      "owner": "agent_assist",
+      "agentHelp": "Draft the listing copy, the screencast script, testing instructions and the data protection answers. A human records the video.",
+      "estTime": "1-2 days",
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          8,
+          6
+        ]
+      }
+    },
+    {
+      "milestone": "listing",
+      "title": "Submit and wait for review",
+      "detail": "Click Submit your app. The app moves through Submitted, then Paused or Reviewed if changes are needed, then Published. Do not resubmit to chase status; Shopify says it moves you to the back of the queue.",
+      "owner": "provider",
+      "agentHelp": "Turn reviewer emails into a fix list and draft replies.",
+      "estTime": "1-8 weeks (reported)",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          8,
+          24,
+          27
+        ],
+        "note": "Statuses are from Shopify's docs [8]; Shopify publishes no duration. The range is from community forum reports and is our estimate."
+      }
+    }
+  ],
+  "nuances": [
+    {
+      "title": "Who creates the OAuth app",
+      "detail": "Public app: you create one app and every merchant installs it, after App Store review. Custom distribution: you create one app per merchant (or per Plus organisation) and send that store an install link. Merchant-created: the merchant creates the app in their own Dev Dashboard and gives you the Client ID and secret, which work with the client credentials grant (Composio S2S_OAUTH2). The last two mean one Composio auth config per customer. Shopify staff say per-merchant custom apps must each be built for that merchant, not cloned to avoid review. Merchant-created apps reach Level 2 customer fields only on the Grow plan or higher, and the merchant needs the App developer role to create one.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1,
+          5,
+          18,
+          22,
+          26
+        ],
+        "note": "Public and custom parts are from Shopify's docs. The merchant-created handover (merchant gives you its Client ID and secret) is our inference: no Shopify page describes it, and the client credentials grant works only when app and store share an organisation [5]. One auth config per customer is also our inference from Composio auth configs holding one client ID and secret (unverified). The Partner Program Agreement point is from a Shopify staff reply [26] (reported); the Grow-plan rule is from Shopify's custom apps page [18]."
+      }
+    },
+    {
+      "title": "Dev Dashboard and Partner Dashboard are both in play",
+      "detail": "Apps, dev stores and distribution now live in the Dev Dashboard. Protected-scope requests, app review and listing still go through the Partner Dashboard; Shopify says these are moving to the Dev Dashboard.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          16,
+          1,
+          6
+        ]
+      }
+    },
+    {
+      "title": "Installs must start from Shopify, not a shop-domain box",
+      "detail": "App Store rule 2.3.1 forbids asking merchants to type their myshopify.com domain, but Composio's Connect Account asks for the store subdomain. For a public app, start installs from the App Store or your install link, read the shop parameter Shopify sends to your App URL, and pass it to Composio yourself.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          23
+        ],
+        "note": "The workaround is our inference (unverified); confirm that Composio lets you set the subdomain programmatically when initiating a connection."
+      }
+    },
+    {
+      "title": "GraphQL only for new public apps",
+      "detail": "Since 1 Apr 2025 new public apps must use the GraphQL Admin API exclusively; REST is legacy. Some Composio Shopify tools follow REST conventions (for example page_info cursors), so check which tools your agent calls.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          22
+        ],
+        "note": "Which Composio tools call REST is not documented (unverified); see openQuestions."
+      }
+    },
+    {
+      "title": "Orders stop at 60 days without read_all_orders",
+      "detail": "read_orders and write_orders cover the last 60 days. read_all_orders extends that, must be declared alongside read_orders, and needs Shopify approval for Partner-organisation apps (but not for merchant-organisation Dev Dashboard apps).",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          7
+        ]
+      }
+    },
+    {
+      "title": "Rate limits are cost-based and set by the merchant's plan",
+      "detail": "GraphQL Admin API restores 100 points/s on Standard, 200 on Advanced, 1,000 on Plus and 2,000 on Commerce Components. One query may cost at most 1,000 points, and input arrays are capped at 250 items. Use bulk operations for large exports.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          11,
+          12
+        ]
+      }
+    },
+    {
+      "title": "Distribution choice is permanent",
+      "detail": "You cannot change an app's distribution method after selecting it. Keep a development app and a separate production app, and choose public or custom on the production one.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "title": "Online tokens die with the staff session",
+      "detail": "grant_options[]=per-user gives an online token that expires after 24 hours or at logout, with no refresh token. A background agent needs offline tokens.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          2,
+          4
+        ]
+      }
+    }
+  ],
+  "whenStuck": [
+    {
+      "symptom": "'App not found' when connecting Shopify in Composio",
+      "fix": "Composio's managed Shopify default is not available. Create your own app and a custom auth config (OAuth2 with your own credentials), as in the steps above.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          20
+        ],
+        "note": "Composio's own toolkit FAQ."
+      }
+    },
+    {
+      "symptom": "Shopify rejects the redirect_uri during connect",
+      "fix": "The redirect URL must exactly match one configured in the released app version. Copy the callback from the Composio auth config, paste it into the Dev Dashboard, and click Release again.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          2,
+          22,
+          23
+        ]
+      }
+    },
+    {
+      "symptom": "A merchant's live store cannot install the app, saying it needs review",
+      "fix": "The app is a public draft. Test on your own development stores, use a custom-distribution app for that one merchant, or wait for App Store approval.",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          26,
+          0
+        ],
+        "note": "Behaviour reported on the Shopify developer forum; the custom-distribution alternative is from Shopify's docs."
+      }
+    },
+    {
+      "symptom": "Customer names, emails or addresses come back empty or access denied",
+      "fix": "Request protected customer data access and the specific fields in the Partner Dashboard. It works on development stores at once; live stores need Shopify's review for public apps.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "symptom": "HTTP 400 at token exchange, or 403 on older orders",
+      "fix": "A 400 usually means a wrong client secret or a gated scope that is not approved: re-enter the secret and reconnect. A 403 on orders older than 60 days means read_all_orders is missing: request it, add it, and reconnect.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          22,
+          7
+        ],
+        "note": "Composio's own KB, plus Shopify's scope docs."
+      }
+    },
+    {
+      "symptom": "Calls start failing with 401 about an hour after connecting",
+      "fix": "The app issues expiring offline tokens. Confirm with Composio that it refreshes Shopify tokens and stores the newest refresh token, since each refresh token is retired once its successor is used.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          3
+        ],
+        "note": "Whether Composio refreshes Shopify expiring tokens is unverified."
+      }
+    }
+  ],
+  "openQuestions": [
+    "Whether Composio's Shopify OAuth2 auth config requests expiring offline tokens (expiring=1) and refreshes them; confirm with Composio support or by checking expires_in on a new connection's token.",
+    "Whether Composio lets you pass the store subdomain programmatically when initiating a connection, so a public app can start installs from Shopify; confirm in the Composio SDK reference or with support.",
+    "Which Composio Shopify tools call the REST Admin API rather than GraphQL, given new public apps must be GraphQL-only; confirm by inspecting the tools your agent uses or asking Composio.",
+    "How long App Store review and protected customer data review take today; Shopify publishes no timeline. Confirm on the Partner Dashboard after submission and in recent forum threads.",
+    "Whether a registered business entity is needed to publish on the App Store; we found no such requirement. Confirm in the Partner Program Agreement or with Partner support.",
+    "Whether Level 1 and 2 data protection requirements are checked for custom-distribution apps; Shopify says they are 'always available' to custom apps but does not say whether the requirements are audited. Confirm with Partner support."
+  ],
+  "sources": [
+    {
+      "title": "Shopify docs: About distribution methods",
+      "url": "https://shopify.dev/docs/apps/launch/distribution",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Select a distribution method",
+      "url": "https://shopify.dev/docs/apps/launch/distribution/select-distribution-method",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Authorization code grant",
+      "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Offline access tokens",
+      "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/offline-access-tokens",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Online access tokens",
+      "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/online-access-tokens",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Client credentials grant",
+      "url": "https://shopify.dev/docs/apps/build/authentication-authorization/client-credentials-grant",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Protected customer data",
+      "url": "https://shopify.dev/docs/apps/launch/protected-customer-data",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Access scopes",
+      "url": "https://shopify.dev/docs/api/usage/access-scopes",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: App Store review process",
+      "url": "https://shopify.dev/docs/apps/launch/app-store-review/review-process",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: App Store requirements",
+      "url": "https://shopify.dev/docs/apps/launch/shopify-app-store/app-store-requirements",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Privacy law compliance (mandatory compliance webhooks)",
+      "url": "https://shopify.dev/docs/apps/build/compliance/privacy-law-compliance",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: GraphQL Admin API rate limits",
+      "url": "https://shopify.dev/docs/apps/build/apis/graphql-admin/rate-limits",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: API limits",
+      "url": "https://shopify.dev/docs/api/usage/limits",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Revenue share and App Store registration",
+      "url": "https://shopify.dev/docs/apps/launch/distribution/revenue-share",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Development stores (Dev Dashboard)",
+      "url": "https://shopify.dev/docs/apps/build/dev-dashboard/development-stores",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify docs: Dev Dashboard",
+      "url": "https://shopify.dev/docs/apps/build/dev-dashboard",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify developer blog: The new Dev Dashboard (25 Sep 2026)",
+      "url": "https://shopify.dev/changelog/blog/the-new-dev-dashboard",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify developer blog: Security update: offline token dates, new security features (27 Oct 2026)",
+      "url": "https://shopify.dev/changelog/blog/app-security-updates-october-2026",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Help Center: Custom apps",
+      "url": "https://help.shopify.com/en/manual/apps/app-types/custom-apps",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Help Center: App types",
+      "url": "https://help.shopify.com/en/manual/apps/app-types",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Composio docs: Shopify toolkit",
+      "url": "https://docs.composio.dev/toolkits/shopify",
+      "type": "composio",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Composio docs: Managed auth by toolkit",
+      "url": "https://docs.composio.dev/toolkits/managed-auth",
+      "type": "composio",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Composio KB: Shopify toolkit",
+      "url": "https://docs.composio.dev/kb/guide/toolkits-shopify.md",
+      "type": "composio",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Composio: How to create OAuth2 credentials for Shopify",
+      "url": "https://composio.dev/auth/shopify",
+      "type": "composio",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Developer Community: Longer App Store review times: what you need to know (Feb 2026)",
+      "url": "https://community.shopify.dev/t/longer-app-store-review-times-what-you-need-to-know/31728",
+      "type": "community",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Developer Community: Does shopifyqlQuery require Level 2 PCD access, how long to get that access? (Apr 2026)",
+      "url": "https://community.shopify.dev/t/does-shopifyqlquery-require-level-2-pcd-access-how-long-to-get-that-access/33439",
+      "type": "community",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Developer Community: Unlisted Shopify app - review required before installation? (Apr 2026)",
+      "url": "https://community.shopify.dev/t/unlisted-shopify-app-review-required-before-installation/33101",
+      "type": "community",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Developer Community: What's the current timeframe for app reviews? (Mar-Apr 2026)",
+      "url": "https://community.shopify.dev/t/whats-the-current-timeframe-for-app-reviews/32649",
+      "type": "community",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify developer changelog: Expiring offline access tokens required for new public apps as of April 1, 2026",
+      "url": "https://shopify.dev/changelog/posts/expiring-offline-access-tokens-required-for-public-apps-april-1-2026",
+      "type": "official",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Developer Community: Testing app without being approved",
+      "url": "https://community.shopify.dev/t/testing-app-without-being-approved/32009",
+      "type": "community",
+      "accessed": "2026-10-29"
+    },
+    {
+      "title": "Shopify Help Center: Staff permissions descriptions",
+      "url": "https://help.shopify.com/manual/your-account/staff-accounts/staff-permissions/staff-permissions-description",
+      "type": "official",
+      "accessed": "2026-10-29"
+    }
+  ],
+  "defaultUseCase": "read-orders-customers",
+  "useCases": [
+    {
+      "id": "read-orders-customers",
+      "label": "Read orders and customers",
+      "summary": "Order and customer data is protected customer data, so on top of App Store review a public app needs Shopify to approve the specific fields it reads (name, email, phone, address) and must meet Level 1 and 2 data protection requirements. Without read_all_orders the agent sees only the last 60 days.",
+      "scopes": [
+        "read_orders",
+        "read_customers"
+      ],
+      "gate": "formal_review",
+      "gateName": "Shopify App Store review plus protected customer data review",
+      "todoIds": [
+        "partner-org",
+        "dev-store",
+        "choose-distribution",
+        "install-flow",
+        "expiring-tokens",
+        "graphql-only",
+        "compliance-webhooks",
+        "pcd-controls",
+        "pcd-request",
+        "read-all-orders",
+        "shopify-billing",
+        "privacy-policy",
+        "support-contact",
+        "app-logo",
+        "custom-callback",
+        "app-store-registration",
+        "listing-materials",
+        "app-store-review"
+      ],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "Store owner or staff with app-install permission",
+        "detail": "Every install is approved by someone at the merchant who can install apps. Merchants also have to agree a privacy and data protection arrangement with you, which Shopify's Level 1 requirements call for."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6,
+          7,
+          0,
+          19,
+          30
+        ],
+        "note": "Gate and data rules are from Shopify's docs. The scope list is our selection; add write_orders only if the agent edits orders. Who at the merchant approves installs is our understanding (unverified); Shopify's staff permissions page [30] lists the install-apps permission."
+      }
+    },
+    {
+      "id": "manage-catalogue",
+      "label": "Manage products and inventory",
+      "summary": "Products and inventory are not protected customer data and the scopes need no special approval, but one app serving many merchants still needs public distribution and so App Store review, with its compliance webhooks, GraphQL-only and expiring-token rules.",
+      "scopes": [
+        "write_products",
+        "write_inventory",
+        "read_locations"
+      ],
+      "gate": "formal_review",
+      "gateName": "Shopify App Store review",
+      "todoIds": [
+        "partner-org",
+        "dev-store",
+        "choose-distribution",
+        "install-flow",
+        "expiring-tokens",
+        "graphql-only",
+        "compliance-webhooks",
+        "shopify-billing",
+        "privacy-policy",
+        "support-contact",
+        "app-logo",
+        "custom-callback",
+        "app-store-registration",
+        "listing-materials",
+        "app-store-review"
+      ],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "Store owner or staff with app-install permission",
+        "detail": "The merchant approves the requested scopes at install. Write access to the catalogue is a bigger ask than read-only, so some merchants will want to know exactly what the agent changes."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          7,
+          0,
+          9
+        ],
+        "note": "write_products and write_inventory include read access [7]. read_locations (to know where stock sits) is our addition (unverified); drop it if your inventory tools do not need locations."
+      }
+    },
+    {
+      "id": "named-stores",
+      "label": "Work in a few named merchants' stores",
+      "summary": "Custom distribution needs no Shopify review and gets protected customer data without a request, but each app serves one store or one Plus organisation. Fine for pilots and a handful of enterprise customers; it does not scale to self-serve sign-up. Each per-merchant app must be built for that merchant; Shopify staff say duplicating a custom app to get round the one-store limit breaches the Partner Program Agreement. In the merchant-created route, Level 2 customer fields (name, email, phone, address) need the merchant to be on the Grow plan or higher.",
+      "scopes": [
+        "write_products",
+        "write_inventory",
+        "read_orders",
+        "read_customers"
+      ],
+      "gate": "none",
+      "todoIds": [
+        "partner-org",
+        "dev-store",
+        "choose-distribution",
+        "per-store-apps",
+        "merchant-install"
+      ],
+      "customerApproval": {
+        "likelihood": "usually",
+        "who": "Store owner or staff with app-install permission (or a Plus organisation admin)",
+        "detail": "You send each merchant an install link generated for their store, and someone there installs it. In the merchant-created route, an App developer on the merchant's side creates the app and hands you its credentials."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1,
+          6,
+          18,
+          26
+        ],
+        "note": "Custom apps need no approval and have Level 1 and 2 data 'always available' per Shopify's docs. The Partner Program Agreement point is from a Shopify staff reply on the community forum [26] (reported); the Grow-plan rule for Level 2 fields in merchant-created apps is from Shopify's custom apps page [18]."
+      }
+    }
+  ],
+  "todos": [
+    {
+      "id": "partner-org",
+      "title": "Shopify Partner account / Dev Dashboard organisation",
+      "detail": "The organisation that owns your apps and development stores. Public apps must belong to a Partner organisation to get the Distribution card.",
+      "owner": "you",
+      "kind": "prereq",
+      "tier": "basic",
+      "hours": [
+        0.25,
+        0.5
+      ],
+      "agentHelp": "List who in your team needs the App developer role and which permissions they need.",
+      "url": "https://www.shopify.com/partners",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14,
+          1
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "dev-store",
+      "title": "Development store for testing and review",
+      "detail": "Reviewers and your own tests need a store with realistic data. Unreviewed public apps install only on development stores in your organisation.",
+      "owner": "you",
+      "kind": "prereq",
+      "tier": "basic",
+      "hours": [
+        0.1,
+        0.5
+      ],
+      "agentHelp": "Generate and load sample products, customers and orders.",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          14
+        ],
+        "note": "The development-store-only rule for drafts is reported [26]. Hours are our estimate."
+      }
+    },
+    {
+      "id": "choose-distribution",
+      "title": "Choose distribution on a separate production app",
+      "detail": "Distribution is permanent per app. Keep a development app, then create the production app and pick Public (any merchant, reviewed) or Custom (one store or Plus organisation, no review).",
+      "owner": "you",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.25,
+        0.5
+      ],
+      "agentHelp": "Write the decision note: expected number of merchants, review timeline, and per-customer setup cost of each route.",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          0,
+          1
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "install-flow",
+      "title": "Start installs from Shopify and hand the shop to Composio",
+      "detail": "The App Store requires OAuth to start immediately on install and forbids asking merchants for their shop domain. Your App URL receives the shop from Shopify; pass its subdomain to Composio when you initiate the connection, then send the merchant to your app UI.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        4,
+        12
+      ],
+      "agentHelp": "Build the App URL handler: validate shop and hmac, start the Composio connection for that subdomain, and redirect to your UI after the callback.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          2,
+          23
+        ],
+        "note": "Requirements are from Shopify's docs; passing the subdomain to Composio programmatically is our inference (unverified). Hours are our estimate."
+      }
+    },
+    {
+      "id": "expiring-tokens",
+      "title": "Use expiring offline tokens",
+      "detail": "Public apps created since 1 Apr 2026 must use expiring offline tokens (1-hour access, 90-day refresh, rotating); all public apps by 1 Jan 2027. Confirm Composio sends expiring=1 and refreshes, or the app will be delisted and its calls will fail.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        1,
+        3
+      ],
+      "agentHelp": "Draft the question to Composio support and a test that checks expires_in and a refresh on a development store connection.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          3,
+          17,
+          28
+        ],
+        "note": "Composio's behaviour is unverified. Hours are our estimate."
+      }
+    },
+    {
+      "id": "graphql-only",
+      "title": "Check the agent uses only the GraphQL Admin API",
+      "detail": "New public apps must be built exclusively on GraphQL; REST is legacy. Prefer SHOPIFY_GRAPH_QL_QUERY or GraphQL-backed tools over REST-style ones.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        1,
+        4
+      ],
+      "agentHelp": "List the Composio Shopify tools the agent calls and flag any that hit /admin/api/.../*.json REST endpoints.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          22
+        ],
+        "note": "Which Composio tools use REST is unverified. Hours are our estimate."
+      }
+    },
+    {
+      "id": "compliance-webhooks",
+      "title": "Mandatory compliance webhooks",
+      "detail": "Subscribe to customers/data_request, customers/redact and shop/redact, return 401 on an invalid HMAC, and complete each request within 30 days. Apps without them are rejected. Composio does not host these for you.",
+      "owner": "agent",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        3,
+        8
+      ],
+      "agentHelp": "Implement the three endpoints, HMAC verification and deletion jobs for any Shopify data you store.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          10
+        ],
+        "note": "That Composio does not host them is our understanding (unverified). Hours are our estimate."
+      }
+    },
+    {
+      "id": "pcd-controls",
+      "title": "Meet Level 1 and Level 2 data protection requirements",
+      "detail": "Level 1: data minimisation, purpose limits, retention periods, encryption at rest and in transit, privacy agreements with merchants. Level 2 (names, emails, phones, addresses): encrypted backups, separate test and production data, staff access limits and logs, and an incident response policy.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "paperwork",
+      "hours": [
+        8,
+        24
+      ],
+      "agentHelp": "Draft the data protection details answers, the retention policy and the incident response policy; map each to the controls you already run.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6
+        ],
+        "note": "Hours are our estimate and depend on what controls you already have."
+      }
+    },
+    {
+      "id": "pcd-request",
+      "title": "Protected customer data review",
+      "detail": "Request access and the specific fields in the Partner Dashboard, complete Data protection details, and submit with the app. Shopify approves only the minimum data needed.",
+      "owner": "provider",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [
+        1,
+        3
+      ],
+      "waitDays": [
+        0,
+        14
+      ],
+      "waitBasis": "estimate",
+      "agentHelp": "Draft per-field justifications tied to agent tasks.",
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "unverified",
+        "sourceIds": [
+          6,
+          25
+        ],
+        "note": "The process is from Shopify's docs. Shopify publishes no timeline; a staff reply says reviews are 'usually done pretty quickly'. The 0-14 day range is our estimate."
+      }
+    },
+    {
+      "id": "read-all-orders",
+      "title": "Request read_all_orders (orders older than 60 days)",
+      "detail": "Only if the agent needs order history beyond 60 days. Partner Dashboard > Apps > your app > API access requests > Read all orders scope > Request access, with a description of why. Apps created in the Dev Dashboard under a merchant organisation do not need this approval; add the scope and release a version.",
+      "owner": "you",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [
+        0.25,
+        0.5
+      ],
+      "waitDays": [
+        1,
+        14
+      ],
+      "waitBasis": "estimate",
+      "optional": true,
+      "agentHelp": "Draft the justification.",
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "unverified",
+        "sourceIds": [
+          7
+        ],
+        "note": "Process from Shopify's scope docs; no published timeline, so the wait is our estimate."
+      }
+    },
+    {
+      "id": "shopify-billing",
+      "title": "Charge merchants through Shopify billing",
+      "detail": "If the Shopify app itself is paid, charges must go through Shopify App Pricing or the Billing API, and merchants must be able to change plans without contacting support. Skip if you bill for your product elsewhere and the Shopify app is free.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        4,
+        16
+      ],
+      "optional": true,
+      "agentHelp": "Model your plans in Shopify App Pricing or implement Billing API charges.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9
+        ],
+        "note": "Whether billing your own product separately while the Shopify app is free satisfies rule 1.2 is our reading (unverified). Hours are our estimate."
+      }
+    },
+    {
+      "id": "privacy-policy",
+      "sharedId": "privacy_policy",
+      "title": "Privacy policy covering Shopify data",
+      "detail": "Shopify's Level 1 requirements say you must tell merchants what personal data you process and why, and have privacy agreements with them. Your App Store submission will need a policy URL.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "agentHelp": "Draft the Shopify section: data read, purpose, retention, and how compliance webhook requests are handled.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          6
+        ],
+        "note": "That the submission needs a policy URL is our understanding (unverified)."
+      }
+    },
+    {
+      "id": "support-contact",
+      "sharedId": "support_contact",
+      "title": "Support and emergency developer contact",
+      "detail": "An emergency developer contact must be added in the Partner Dashboard before submission. A public support contact for merchants is expected on the listing.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Set up a shared inbox and a short support page.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9
+        ],
+        "note": "The emergency contact is rule 4.5.6; the merchant-facing support contact is our understanding (unverified)."
+      }
+    },
+    {
+      "id": "app-logo",
+      "sharedId": "app_logo",
+      "title": "App icon",
+      "detail": "Needed for the listing and the install screen. Pricing must not appear in the icon.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Check the file's size and aspect ratio before upload.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9
+        ],
+        "note": "Rule 4.2.2. Shopify's required icon dimensions were not on the page we read."
+      }
+    },
+    {
+      "id": "custom-callback",
+      "sharedId": "composio_custom_callback",
+      "title": "Composio callback on your own domain (optional)",
+      "detail": "Shopify does not verify redirect domains, so the Composio callback works as is. A callback on your own domain only matters if you want your brand throughout the install flow.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "optional": true,
+      "agentHelp": "Set up the white-label redirect and update the app version's redirect URL.",
+      "evidence": {
+        "level": "unverified",
+        "note": "We found no Shopify rule on redirect domains; this is our reading of the authorisation docs."
+      }
+    },
+    {
+      "id": "app-store-registration",
+      "title": "Register for the App Store ($19 one-time)",
+      "detail": "A one-time $19 fee per Partner account unlocks public distribution and the revenue share plan; not needed for custom apps only.",
+      "owner": "you",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.1,
+        0.25
+      ],
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          13
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "listing-materials",
+      "title": "Prepare the submission and listing materials",
+      "detail": "Demo screencast of onboarding and features, test credentials with full access, real screenshots, listing copy without unsubstantiated claims, and data protection details.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "paperwork",
+      "hours": [
+        8,
+        24
+      ],
+      "agentHelp": "Draft listing copy, the screencast script and testing instructions. A human records the screencast.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          9,
+          8
+        ],
+        "note": "Hours are our estimate."
+      }
+    },
+    {
+      "id": "app-store-review",
+      "title": "Shopify App Store review",
+      "detail": "Submit from the App Store review page once every flagged issue is fixed. Paused or Reviewed status means changes are needed; do not resubmit just to chase status.",
+      "owner": "provider",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [
+        1,
+        3
+      ],
+      "waitDays": [
+        7,
+        60
+      ],
+      "waitBasis": "reported",
+      "agentHelp": "Run a pre-submission check against the requirements list and turn reviewer feedback into a fix list.",
+      "url": "https://partners.shopify.com",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [
+          8,
+          24,
+          27
+        ],
+        "note": "Shopify publishes no review duration [8]. 2026 forum reports put the first look at 18 days to 1-1.5 months; one developer who submitted in January was still unapproved in mid-March after fix rounds [24, 27]. The 7-60 day range is our estimate."
+      }
+    },
+    {
+      "id": "per-store-apps",
+      "title": "One custom app and Composio auth config per merchant",
+      "detail": "For each merchant, create a custom-distribution app (or have the merchant create one in their Dev Dashboard and share its credentials), then a matching Composio auth config. Every scope change is repeated per app.",
+      "owner": "you",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.5,
+        1.5
+      ],
+      "agentHelp": "Script the per-merchant setup from shopify.app.toml with Shopify CLI and create the Composio auth config through its API.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          1,
+          5,
+          22
+        ],
+        "note": "Hours are per merchant and our estimate. One auth config per app is our inference (unverified)."
+      }
+    },
+    {
+      "id": "merchant-install",
+      "title": "Generate and send each merchant's install link",
+      "detail": "Under Distribution > Manage custom install link, enter the merchant's myshopify.com domain, click Generate link and send it. Clear 'Allow multi-store installs for one Plus organization' to restrict it to one store.",
+      "owner": "you",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [
+        0.1,
+        0.25
+      ],
+      "agentHelp": "Draft the merchant email explaining the scopes and what the agent will do.",
+      "url": "https://dev.shopify.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [
+          1
+        ],
+        "note": "Hours are per merchant and our estimate."
+      }
+    }
+  ]
+}

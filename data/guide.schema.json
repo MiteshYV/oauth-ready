@@ -1,0 +1,630 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OAuthReadinessGuide",
+  "type": "object",
+  "required": [
+    "slug",
+    "name",
+    "website",
+    "summary",
+    "lastVerified",
+    "origin",
+    "verdict",
+    "composio",
+    "prerequisites",
+    "steps",
+    "nuances",
+    "whenStuck",
+    "openQuestions",
+    "sources",
+    "defaultUseCase",
+    "useCases",
+    "todos"
+  ],
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "tested",
+            "checked",
+            "sourced",
+            "reported",
+            "unverified"
+          ],
+          "description": "tested = we did it ourselves; checked = an http_probe response the agent ran shows it; cite probeIds; sourced = stated in official provider docs; reported = community/forums/third party; unverified = inferred, could not confirm"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Indexes into the sources array"
+        },
+        "probeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "ids of http_probe results that show this (level checked only)"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "owner": {
+      "enum": [
+        "agent",
+        "agent_assist",
+        "you",
+        "provider"
+      ],
+      "description": "agent = an agent can do it end to end; agent_assist = agent prepares it, you review and submit; you = only a human can do it (sign-in, payment, legal, ToS); provider = waiting on the provider"
+    },
+    "range": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[min, max]"
+    }
+  },
+  "properties": {
+    "probes": {
+      "type": "array",
+      "description": "Filled in by the server from the http_probe calls the agent made. Do not write this yourself.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "status",
+          "snippet",
+          "at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "finalUrl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "slug": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences: what makes this provider easy or hard"
+    },
+    "lastVerified": {
+      "type": "string",
+      "description": "ISO date"
+    },
+    "origin": {
+      "enum": [
+        "curated",
+        "live"
+      ],
+      "description": "curated = researched and spot-checked; live = generated on demand by the agent"
+    },
+    "verdict": {
+      "type": "object",
+      "required": [
+        "difficulty",
+        "difficultyReason",
+        "milestones",
+        "topBlockers"
+      ],
+      "properties": {
+        "difficulty": {
+          "enum": [
+            "Easy",
+            "Moderate",
+            "Hard",
+            "Gated"
+          ],
+          "description": "Easy = self-serve, no review; Moderate = some review or paperwork; Hard = formal verification or security assessment; Gated = needs partner approval, paid tier or business relationship"
+        },
+        "difficultyReason": {
+          "type": "string"
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "activeEffort",
+              "calendarWait",
+              "approvalRequired"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "test",
+                  "production",
+                  "listing"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "activeEffort": {
+                "type": "string",
+                "description": "SHORT headline value, under 30 characters, e.g. '15-30 min' or '1-3 days'. Put caveats in notes."
+              },
+              "calendarWait": {
+                "type": "string",
+                "description": "SHORT headline value, under 40 characters, e.g. 'None' or '2-6 weeks'. Put breakdowns and caveats in notes."
+              },
+              "approvalRequired": {
+                "type": "boolean"
+              },
+              "approvalName": {
+                "type": "string"
+              },
+              "whatYouGet": {
+                "type": "string"
+              },
+              "limits": {
+                "type": "string",
+                "description": "Restrictions while at this milestone, e.g. user caps, token expiry"
+              },
+              "evidence": {
+                "$ref": "#/$defs/evidence"
+              },
+              "notes": {
+                "type": "string",
+                "description": "Breakdown and caveats behind the effort and wait figures, with where each number comes from"
+              }
+            }
+          }
+        },
+        "topBlockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "detail",
+              "evidence"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "evidence": {
+                "$ref": "#/$defs/evidence"
+              }
+            }
+          }
+        }
+      }
+    },
+    "composio": {
+      "type": "object",
+      "properties": {
+        "toolkitSlug": {
+          "type": "string"
+        },
+        "managedAuth": {
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "meanwhile": {
+          "type": "string",
+          "description": "What you can ship on while waiting, e.g. managed auth for internal testing"
+        },
+        "redirectUriNote": {
+          "type": "string"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        }
+      }
+    },
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item",
+          "owner",
+          "evidence"
+        ],
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/$defs/owner"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "milestone",
+          "title",
+          "detail",
+          "owner",
+          "evidence"
+        ],
+        "properties": {
+          "milestone": {
+            "enum": [
+              "test",
+              "production",
+              "listing"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/$defs/owner"
+          },
+          "agentHelp": {
+            "type": "string",
+            "description": "Concretely what an agent can do or prepare for this step"
+          },
+          "estTime": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "Deep link to the exact console page"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "nuances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "detail",
+          "evidence"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "whenStuck": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "symptom",
+          "fix",
+          "evidence"
+        ],
+        "properties": {
+          "symptom": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "openQuestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What we could not verify and how a developer could confirm it"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "url",
+          "type"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "official",
+              "community",
+              "composio",
+              "test"
+            ]
+          },
+          "accessed": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "testLog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "defaultUseCase": {
+      "type": "string",
+      "description": "id of the use case shown first; the most common agent use"
+    },
+    "useCases": {
+      "type": "array",
+      "minItems": 1,
+      "description": "What the developer's agent will do with this app. Difficulty, required to-dos and effort depend on the use case.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "summary",
+          "scopes",
+          "gate",
+          "todoIds",
+          "customerApproval",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "kebab-case, e.g. 'send-only', 'read-mail'"
+          },
+          "label": {
+            "type": "string",
+            "description": "What the agent does, in a few words, e.g. 'Send email only'"
+          },
+          "summary": {
+            "type": "string",
+            "description": "1-2 sentences: why this use case is as hard as it is"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Exact scope or permission names"
+          },
+          "gate": {
+            "enum": [
+              "none",
+              "light_review",
+              "formal_review",
+              "security_assessment",
+              "discretionary",
+              "not_available"
+            ],
+            "description": "Provider's hurdle to open this use case to any user. none = self-serve; light_review = automated or short verification (brand, publisher, sensitive-scope review under ~2 weeks); formal_review = human app, scope or marketplace review; security_assessment = third-party security assessment; discretionary = provider may refuse (partner programmes); not_available = not offered to developers"
+          },
+          "gateName": {
+            "type": "string",
+            "description": "Provider's name for the review, if any"
+          },
+          "todoIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ids of to-dos required (or optional) for production in this use case"
+          },
+          "customerApproval": {
+            "type": "object",
+            "required": [
+              "likelihood"
+            ],
+            "properties": {
+              "likelihood": {
+                "enum": [
+                  "none",
+                  "sometimes",
+                  "usually"
+                ]
+              },
+              "who": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              }
+            },
+            "description": "Approval needed inside each customer's org (separate from the provider's review)"
+          },
+          "notAvailableReason": {
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "todos": {
+      "type": "array",
+      "description": "Everything needed after the test milestone to open the app to any user. Ticking a to-do removes its hours (and wait) from the developer's remaining effort.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "owner",
+          "kind",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "sharedId": {
+            "type": "string",
+            "description": "If this to-do is a shared readiness item from vocabulary.json, its id. Hours, wait and tier then come from the vocabulary."
+          },
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string",
+            "description": "Provider-specific detail, 1-2 sentences"
+          },
+          "owner": {
+            "$ref": "#/$defs/owner"
+          },
+          "kind": {
+            "enum": [
+              "prereq",
+              "task",
+              "review"
+            ],
+            "description": "prereq = something you need to have; task = work you do; review = submitting to the provider and waiting (its wait runs after prerequisites)"
+          },
+          "tier": {
+            "enum": [
+              "basic",
+              "paperwork",
+              "costly",
+              "relationship"
+            ],
+            "description": "Required when there is no sharedId"
+          },
+          "hours": {
+            "$ref": "#/$defs/range"
+          },
+          "waitDays": {
+            "$ref": "#/$defs/range"
+          },
+          "waitBasis": {
+            "enum": [
+              "official",
+              "reported",
+              "estimate"
+            ]
+          },
+          "optional": {
+            "type": "boolean"
+          },
+          "blocking": {
+            "type": "boolean",
+            "description": "Hard prerequisite: without it the path is closed"
+          },
+          "agentHelp": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    },
+    "interpretation": {
+      "type": "object",
+      "required": [
+        "covers"
+      ],
+      "description": "Only when the name could mean more than one product or API",
+      "properties": {
+        "covers": {
+          "type": "string",
+          "description": "The product or API this guide covers, e.g. 'Zoom Meetings API'"
+        },
+        "alternatives": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string"
+          },
+          "description": "Other products a developer might have meant, as names to search for"
+        }
+      }
+    }
+  }
+}

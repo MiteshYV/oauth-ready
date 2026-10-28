@@ -1,0 +1,606 @@
+{
+  "slug": "googlecalendar",
+  "name": "Google Calendar (Google)",
+  "website": "https://developers.google.com/workspace/calendar/api",
+  "category": "Calendar",
+  "summary": "No Calendar scope is restricted, so there is no CASA security assessment. Reading or writing events needs Google's sensitive-scope verification (3-5 or 10 business days by Google's own figures). If you already verified a Google project for Gmail, most of the work is done: add the Calendar scopes and submit them for data access review.",
+  "lastVerified": "2026-10-29",
+  "origin": "curated",
+  "verdict": {
+    "difficulty": "Moderate",
+    "difficultyReason": "Event access uses sensitive scopes: brand verification plus a sensitive-scope review with a justification and demo video, but no CASA. A brand-verified Gmail project only needs the Calendar scope review on top.",
+    "milestones": [
+      {
+        "id": "test",
+        "label": "Your own account and up to 100 test users",
+        "activeEffort": "30-60 min",
+        "calendarWait": "None",
+        "approvalRequired": false,
+        "whatYouGet": "A working Composio custom auth config with your own client ID. Listed test users can grant Calendar scopes after clicking through the unverified-app warning.",
+        "limits": "External + Testing: max 100 test users, and the cap counts over the app's lifetime, so removing test users does not free places; test-user authorisations and refresh tokens expire 7 days after consent (Calendar scopes are not exempt). Internal user type: no cap or expiry, but only your own Workspace/Cloud Identity org can connect.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [21, 8, 7],
+          "note": "Seen in our test on 29 Oct 2026: the 100-user cap counted over the app's lifetime, on Google's Audience page [21] (one project serves Gmail and Calendar). From Google's docs, not seen: the 7-day expiry (Calendar scopes not exempt), the unverified-app warning, and the Internal user type rules. The effort range is our estimate."
+        },
+        "notes": "15-30 min if you already have a Gmail test project and Web client: enable the Calendar API, add scopes, create a second Composio auth config with the same client. Our estimate."
+      },
+      {
+        "id": "production",
+        "label": "Any Google user can connect",
+        "activeEffort": "0.5-2 days",
+        "calendarWait": "1-3 weeks",
+        "approvalRequired": true,
+        "approvalName": "Google sensitive scope verification (plus brand verification if the project is not already verified)",
+        "whatYouGet": "No unverified-app screen for Calendar scopes, your name and logo on the consent screen, no 100-user cap, long-lived refresh tokens.",
+        "limits": "Limited Use rules apply to Calendar data. New sensitive scopes added later need their own review before use.",
+        "evidence": {
+          "level": "unverified",
+          "sourceIds": [1, 2, 3],
+          "note": "Review times are Google's published estimates; hands-on days and the 1-3 week total are our estimates."
+        },
+        "notes": "Hands-on: from scratch about 1-2 days (homepage, privacy policy, domain, callback, video); with a verified Gmail project about half a day (privacy policy update, justification, video). Waiting: brand minutes or 2-3 business days (skipped if already verified); sensitive scopes 3-5 business days per developers.google.com, 10 business days per Google's FAQ. One developer reported a Calendar review silent for four months."
+      }
+    ],
+    "topBlockers": [
+      {
+        "title": "Event read/write scopes are sensitive and need Google review",
+        "detail": "Google gives 'reading events stored in Google Calendar' as an example of a sensitive scope. calendar.events, calendar.readonly and the full calendar scope all need a per-scope justification and an unlisted YouTube demo video before the public can grant them.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [1, 5, 19, 20],
+          "note": "Google's example and requirements are official; the per-scope table is from Nylas. Google's Data Access page classed calendar.events as sensitive in our 29 Oct 2026 test [20]; calendar.readonly and the full calendar scope were not added."
+        }
+      },
+      {
+        "title": "Testing mode breaks agents after 7 days",
+        "detail": "For an External app in Testing, refresh tokens expire 7 days after consent unless the only scopes are name, email and profile. Background agents then fail with invalid_grant. Use Internal for your own org, or publish and verify.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [7, 8]
+        }
+      },
+      {
+        "title": "Calendar scopes on a verified production client re-trigger the warning",
+        "detail": "If you add Calendar scopes to an already-verified Gmail project, do not request them until approved. Using an unapproved scope shows the unverified-app screen again and counts toward the lifetime 100-user cap, which cannot be reset.",
+        "evidence": {
+          "level": "sourced",
+          "sourceIds": [4, 3, 8]
+        }
+      },
+      {
+        "title": "Google must verify the domain in your redirect URI",
+        "detail": "Brand verification checks every domain tied to the OAuth client, including Web-client redirect URIs. Composio's default callback sits on backend.composio.dev, which you cannot verify, so route it through your own domain with Composio's redirect proxy before you submit.",
+        "evidence": {
+          "level": "reported",
+          "sourceIds": [6, 16],
+          "note": "The domain rule is official; that the default callback fails review is our inference, as in the Gmail guide."
+        }
+      },
+      {
+        "title": "Reviews can stall without explanation",
+        "detail": "One developer submitted calendar.events on 22 Apr 2026 and had no Trust & Safety email four months later, with privacy policy still 'in review'.",
+        "evidence": {
+          "level": "reported",
+          "sourceIds": [17],
+          "note": "Single forum thread; no Google reply."
+        }
+      }
+    ]
+  },
+  "composio": {
+    "toolkitSlug": "googlecalendar",
+    "managedAuth": "yes",
+    "meanwhile": "Ship on Composio's managed Google Calendar app (consent screen shows Composio) while your scope review runs. Its default scopes are already approved; adding extra scopes to a managed config causes 'App is blocked'. Switching to your own auth config only affects new connections.",
+    "redirectUriNote": "Copy the exact redirect URI the Composio dashboard shows when you create the auth config. On 29 Oct 2026 the dashboard showed https://backend.composio.dev/api/v1/auth-apps/add; some Composio docs show https://backend.composio.dev/api/v3/toolkits/auth/callback. It must match exactly, and you can change it in the dashboard to white-label the callback on your own domain. You can reuse the Web client you made for Gmail. For production, register your own-domain proxy URL as the Google redirect URI.",
+    "evidence": {
+      "level": "sourced",
+      "sourceIds": [13, 15, 16],
+      "note": "Managed OAuth availability and the 'App is blocked' cause are from Composio's toolkit page; client reuse is from Composio's Google Apps guide. The redirect URI value is what the Composio dashboard showed for GitHub and Gmail auth configs in our 29 Oct 2026 hands-on test; we did not create a Google Calendar auth config."
+    }
+  },
+  "prerequisites": [
+    {
+      "item": "Google account with access to Google Cloud console",
+      "detail": "Use a company account: the project Owner and Editors receive all verification email.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [11, 1]
+      }
+    },
+    {
+      "item": "A domain you own, with DNS access",
+      "detail": "For the homepage, privacy policy, Search Console verification and your own-domain OAuth callback. The same domain you used for Gmail works.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [6, 1]
+      }
+    },
+    {
+      "item": "Public homepage and privacy policy on that domain",
+      "detail": "The privacy policy must sit on the homepage's domain and say how the app accesses, uses, stores or shares Google user data, including Calendar data.",
+      "owner": "agent_assist",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [1, 5]
+      }
+    },
+    {
+      "item": "Google Workspace or Cloud Identity organisation (only for the Internal shortcut)",
+      "detail": "Internal apps skip verification, the unverified-app screen and the user cap, but only your org's members can connect.",
+      "owner": "you",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [1, 8]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "milestone": "test",
+      "title": "Create or reuse a Google Cloud test project",
+      "detail": "If you set up a test project for Gmail, reuse it. Otherwise create one; keep production in a separate project so test clients don't block verification.",
+      "owner": "you",
+      "agentHelp": "Check whether a Gmail test project exists and suggest reusing it.",
+      "estTime": "5 min",
+      "url": "https://console.cloud.google.com/projectcreate",
+      "evidence": {
+        "level": "unverified",
+        "note": "The test/prod split follows Google's advice cited in the Gmail guide; not re-checked here."
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Enable the Google Calendar API",
+      "detail": "Enable calendar-json.googleapis.com. Calendar scopes only show on Data Access once the API is enabled, and tool calls fail with 'API has not been used in project' without it.",
+      "owner": "you",
+      "agentHelp": "Give the deep link, or run 'gcloud services enable calendar-json.googleapis.com' with gcloud authenticated.",
+      "estTime": "2 min",
+      "url": "https://console.cloud.google.com/flows/enableapi?apiid=calendar-json.googleapis.com",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [11, 4, 13]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Set up Branding and Audience",
+      "detail": "Google Auth platform > Branding: app name and support email. Audience: External (starts in Testing, add up to 100 test users) or Internal (your org only). Skip if already done for Gmail.",
+      "owner": "you",
+      "agentHelp": "Recommend Internal or External from who will connect, and prepare the test-user list.",
+      "estTime": "10 min",
+      "url": "https://console.developers.google.com/auth/branding",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [8, 11]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Add the narrowest Calendar scopes on Data Access",
+      "detail": "Data Access > Add or remove scopes. Prefer calendar.events for read/write, calendar.freebusy for availability only, or calendar.app.created if the agent can work in its own calendar. Avoid the full calendar scope (sharing and permanent delete). The console shows each scope's category.",
+      "owner": "agent_assist",
+      "agentHelp": "Map each agent feature and Composio Calendar tool to the minimum scope, and note the category the console shows.",
+      "estTime": "10 min",
+      "url": "https://console.developers.google.com/auth/scopes",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [0, 4, 5]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create or reuse a Web application OAuth client",
+      "detail": "Composio's guide says you can reuse the Gmail OAuth client or create a new one. A new client: Clients > Create Client > Web application, add the redirect URI exactly as the Composio dashboard shows it, and copy the secret at once. The 'AI-powered agent' tick cannot be changed later, so read the nuance on it before deciding.",
+      "owner": "you",
+      "agentHelp": "Pull the exact callback from the Composio dashboard and store the secret in your secret manager.",
+      "estTime": "5 min",
+      "url": "https://console.developers.google.com/auth/clients",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [15, 11, 16]
+      }
+    },
+    {
+      "milestone": "test",
+      "title": "Create the Composio auth config and connect a test account",
+      "detail": "In Composio choose Google Calendar > OAuth2 > your own credentials, paste the client ID and secret, and set the same scopes. Expect the unverified-app warning and a re-auth after 7 days in Testing. Use calendar ID 'primary', not 'me'.",
+      "owner": "agent_assist",
+      "agentHelp": "Create the auth config via the Composio API or SDK, run a test event list or free/busy call, and check the granted scopes.",
+      "estTime": "10 min",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [15, 14, 7, 8],
+        "note": "Composio steps are from Composio docs; warning and expiry from Google docs."
+      }
+    }
+  ],
+  "nuances": [
+    {
+      "title": "No Calendar scope is restricted, so no CASA",
+      "detail": "Google's Workspace policy lists restricted scopes for Gmail, Drive, Chat and Meet only. Calendar apps need sensitive-scope verification but never the paid annual security assessment.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [9, 19],
+        "note": "Calendar is absent from Google's restricted list; Nylas's table marks every Calendar scope it lists as needing no security assessment."
+      }
+    },
+    {
+      "title": "Google does not publish a per-scope classification for Calendar",
+      "detail": "The Calendar scopes page lists 20 scopes without categories; the Data Access page shows them per project. In our test project it listed calendar.events as sensitive. One developer recorded calendar.app.created as non-sensitive there. Another found calendar.freebusy and calendar.app.created missing from the picker.",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [0, 4, 18, 17, 20],
+        "note": "That categories appear on Data Access is official; calendar.events was seen as sensitive in our 29 Oct 2026 test [20]; the other classifications are community reports."
+      }
+    },
+    {
+      "title": "Google's 'AI-powered agent' client option",
+      "detail": "Creating a Web client now offers 'Use this client for an AI-powered agent'. Google's help text: 'Designates this client for AI agents that take actions on behalf of users. Select this if your client uses Google MCP tools. If your application supports both AI agent workflows and standard user features, use separate OAuth clients for each.' The help text ties the option to Google MCP tools, so whether an agent that reaches Google through Composio should tick it is unconfirmed.",
+      "evidence": {
+        "level": "tested",
+        "sourceIds": [22],
+        "note": "The option and its help text were seen on 29 Oct 2026 [22]. Whether a Composio-based agent should use it is unconfirmed; see openQuestions."
+      }
+    },
+    {
+      "title": "Adding Calendar to a verified Gmail project is a scope review, not a fresh start",
+      "detail": "You can add sensitive scopes to a verified app at any time; they need approval before use. Brand verification is only redone if you change the app name, logo, redirect URI, homepage link or privacy policy link. A completed CASA does not need redoing for added scopes.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [3, 4]
+      }
+    },
+    {
+      "title": "Users can grant only some scopes",
+      "detail": "Google issues a token if the user grants at least one permission. Check the granted scopes and disable features that lack them.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [7]
+      }
+    },
+    {
+      "title": "Limited Use applies to Calendar data",
+      "detail": "Sensitive-scope data falls under the API Services User Data Policy. The Workspace policy, which covers 'other Google Workspace APIs', bans using user data to create, train or improve ML or AI models, except a model personal to that user.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [9],
+        "note": "The Workspace policy does not name the Calendar API explicitly."
+      }
+    },
+    {
+      "title": "Free/busy accepts four scopes",
+      "detail": "freebusy.query works with calendar.freebusy, calendar.events.freebusy, calendar.readonly or calendar. Composio's Find Free Slots tool returns processed availability; Query Calendar Availability returns raw busy intervals.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [10, 14]
+      }
+    },
+    {
+      "title": "Customer Workspace admins can block or trust your app",
+      "detail": "Admins can restrict most Workspace services and block unconfigured third-party apps; marking your app Trusted overrides this.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [12]
+      }
+    }
+  ],
+  "whenStuck": [
+    {
+      "symptom": "'Google Calendar API has not been used in project' error",
+      "fix": "Enable the Calendar API in the project that owns the OAuth client, wait a few minutes and retry.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [13]
+      }
+    },
+    {
+      "symptom": "'App is blocked' or unverified-app screen after adding scopes",
+      "fix": "The client is requesting Calendar scopes Google has not approved for it. Remove the extra scopes, or submit them for verification and wait before requesting them.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [13, 4]
+      }
+    },
+    {
+      "symptom": "invalid_grant / 'Token has been expired or revoked' a week after connecting",
+      "fix": "External + Testing refresh tokens die after 7 days. Reconnect, switch to Internal, or publish and verify.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [7, 8]
+      }
+    },
+    {
+      "symptom": "Error 400: redirect_uri_mismatch",
+      "fix": "Copy the redirect URI exactly from the Composio dashboard into the Web client's Authorized redirect URIs (on 29 Oct 2026 it was /api/v1/auth-apps/add; some Composio docs show /api/v3/toolkits/auth/callback; watch trailing slashes).",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [15, 16]
+      }
+    },
+    {
+      "symptom": "A Calendar scope is missing from the Data Access picker",
+      "fix": "Enable the Calendar API first, or enter the scope URL manually in the add-scopes panel.",
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [4],
+        "note": "One developer reported calendar.freebusy and calendar.app.created missing even so [17]."
+      }
+    },
+    {
+      "symptom": "Verification silent for weeks",
+      "fix": "Check owner/editor inboxes and spam, reply on the latest Trust & Safety thread, and avoid repeated resubmissions.",
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [17]
+      }
+    }
+  ],
+  "openQuestions": [
+    "The official category of calendar.freebusy, calendar.events.freebusy, calendar.app.created and calendar.calendarlist.readonly; confirm on Data Access in your own project.",
+    "Which scopes Composio's managed Calendar app requests by default; confirm via the toolkit's composio_managed_auth_schemes or Composio support.",
+    "Whether Calendar scopes can be reviewed in the same submission as Gmail's, and whether the demo video must cover both; confirm in the Verification Center.",
+    "Sensitive-scope review time: Google states both 3-5 and 10 business days; confirm from your own submission.",
+    "Refresh-token limit: Google says 100 per account per client; Composio's docs say about 50 per account. Treat 50 as the safe ceiling until confirmed.",
+    "Whether Google will verify an app whose redirect URI stays on backend.composio.dev; confirm with Composio support before relying on it.",
+    "Whether a client used through Composio should be marked 'Use this client for an AI-powered agent': Google's help text ties it to Google MCP tools, and Composio calls Google APIs directly. Confirm by reading Google's help page (support.google.com/cloud/answer/15549257#agentic-client) or asking Composio support before you create your production client.",
+    "Google Workspace Marketplace listing for Calendar was not researched."
+  ],
+  "sources": [
+    { "title": "Choose Google Calendar API scopes", "url": "https://developers.google.com/workspace/calendar/api/auth", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Sensitive scope verification", "url": "https://developers.google.com/identity/protocols/oauth2/production-readiness/sensitive-scope-verification", "type": "official", "accessed": "2026-10-27" },
+    { "title": "OAuth App Verification Help Center FAQ", "url": "https://support.google.com/cloud/answer/13463817", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Changes to an approved app", "url": "https://support.google.com/cloud/answer/13464018", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Manage App Data Access", "url": "https://support.google.com/cloud/answer/15549135", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Verification requirements", "url": "https://support.google.com/cloud/answer/13464321", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Brand verification", "url": "https://developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Using OAuth 2.0 to Access Google APIs", "url": "https://developers.google.com/identity/protocols/oauth2", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Manage App Audience (Google Auth Platform)", "url": "https://support.google.com/cloud/answer/15549945", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Google Workspace API user data and developer policy", "url": "https://developers.google.com/workspace/workspace-api-user-data-developer-policy", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Freebusy: query (Calendar API reference)", "url": "https://developers.google.com/workspace/calendar/api/v3/reference/freebusy/query", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Google Calendar API Python quickstart", "url": "https://developers.google.com/workspace/calendar/quickstart/python", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Control which third-party & internal apps access Google Workspace data", "url": "https://knowledge.workspace.google.com/admin/apps/control-which-third-party-and-internal-apps-access-google-workspace-data", "type": "official", "accessed": "2026-10-27" },
+    { "title": "Composio: Google Calendar toolkit", "url": "https://docs.composio.dev/toolkits/googlecalendar", "type": "composio", "accessed": "2026-10-27" },
+    { "title": "Composio KB: Google Calendar", "url": "https://docs.composio.dev/kb/guide/toolkits-google-calendar.md", "type": "composio", "accessed": "2026-10-27" },
+    { "title": "Composio: How to create OAuth2 credentials for Google Apps", "url": "https://composio.dev/auth/googleapps", "type": "composio", "accessed": "2026-10-27" },
+    { "title": "Composio: White-labeling authentication (redirect proxy)", "url": "https://docs.composio.dev/docs/authentication/white-labeling-authentication", "type": "composio", "accessed": "2026-10-27" },
+    { "title": "Google Dev Forums: OAuth verification pending since 22 Apr 2026 (calendar.events)", "url": "https://discuss.google.dev/t/oauth-verification-pending-since-22-apr-2026-first-trust-safety-email-never-received/392005", "type": "community", "accessed": "2026-10-27" },
+    { "title": "GitHub issue: calendar.app.created listed as non-sensitive in Data Access", "url": "https://github.com/thedavidweng/adp-calendar/issues/3", "type": "community", "accessed": "2026-10-27" },
+    { "title": "Nylas: Google verification and security assessment guide", "url": "https://developer.nylas.com/docs/dev-guide/provider-guides/google/google-verification-security-assessment-guide", "type": "community", "accessed": "2026-10-27" },
+    { "title": "Hands-on test, 29 Oct 2026: Google Data Access scope classes", "url": "/tests/google-restricted-scopes.png", "type": "test", "accessed": "2026-10-29" },
+    { "title": "Hands-on test, 29 Oct 2026: Google Audience page, 100-user cap", "url": "/tests/google-test-users.png", "type": "test", "accessed": "2026-10-29" },
+    { "title": "Hands-on test, 29 Oct 2026: Google 'AI-powered agent' client option", "url": "/tests/google-ai-agent-client.png", "type": "test", "accessed": "2026-10-29" }
+  ],
+  "testLog": [
+    { "date": "2026-10-29", "action": "Added calendar.events (with Gmail scopes) on Data Access in a Google Cloud test project", "result": "Google classed calendar.events as sensitive, not restricted." },
+    { "date": "2026-10-29", "action": "Read the Audience page of the same project", "result": "'Allowed user cap prior to app verification is 100, and is counted over the entire lifetime of the app.'" },
+    { "date": "2026-10-29", "action": "Created a Web application OAuth client", "result": "The form offers 'Use this client for an AI-powered agent', with help text that ties it to Google MCP tools." },
+    { "date": "2026-10-29", "action": "Not tested", "result": "We did not enable the Calendar API or create a Composio Google Calendar auth config; the Gmail guide records the Composio side of the Google test." }
+  ],
+  "defaultUseCase": "read-write-events",
+  "useCases": [
+    {
+      "id": "read-write-events",
+      "label": "Read and create events",
+      "summary": "calendar.events is sensitive: brand plus sensitive-scope verification with a justification and demo video, but no CASA. If your Gmail project is already brand-verified, only the scope review remains.",
+      "scopes": ["https://www.googleapis.com/auth/calendar.events"],
+      "gate": "light_review",
+      "gateName": "Google sensitive scope verification",
+      "todoIds": ["gcal_domain", "gcal_homepage", "gcal_privacy_policy", "gcal_privacy_calendar", "gcal_support", "gcal_logo", "gcal_terms", "gcal_cloud_project", "gcal_prod_scopes", "gcal_domain_verified", "gcal_callback", "gcal_brand", "gcal_justification", "gcal_scope_review", "gcal_switch_config"],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "Customer's Google Workspace admin",
+        "detail": "Admins can block unconfigured third-party apps or restrict Calendar access; they can mark your app Trusted. Consumer Google accounts need no admin."
+      },
+      "evidence": {
+        "level": "sourced",
+        "sourceIds": [20, 1, 2, 9, 14, 12],
+        "note": "Seen in our test on 29 Oct 2026: Google's Data Access page classed calendar.events as sensitive, not restricted [20]. From Google's docs, not seen: the brand and sensitive-scope verification steps (justification and demo video), that CASA is not needed, the Workspace-admin notes, and that Composio's list/fetch event tools need calendar.events."
+      }
+    },
+    {
+      "id": "free-busy",
+      "label": "Check free/busy only",
+      "summary": "calendar.freebusy exposes availability only, never event details, which makes the justification easy. Google does not publish its category, so plan for the same sensitive-scope review; if your console shows it as non-sensitive, only brand verification is left.",
+      "scopes": ["https://www.googleapis.com/auth/calendar.freebusy"],
+      "gate": "light_review",
+      "gateName": "Google sensitive scope verification (if the console marks the scope sensitive)",
+      "todoIds": ["gcal_domain", "gcal_homepage", "gcal_privacy_policy", "gcal_privacy_calendar", "gcal_support", "gcal_logo", "gcal_terms", "gcal_cloud_project", "gcal_prod_scopes", "gcal_domain_verified", "gcal_callback", "gcal_brand", "gcal_justification", "gcal_scope_review", "gcal_switch_config"],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "Customer's Google Workspace admin",
+        "detail": "Same API controls as event access."
+      },
+      "evidence": {
+        "level": "unverified",
+        "sourceIds": [0, 10, 17],
+        "note": "The scope and its use in freebusy.query are official; its sensitivity category is unconfirmed, and one developer could not find it in the Data Access picker."
+      }
+    },
+    {
+      "id": "app-created-calendar",
+      "label": "Manage its own calendar only",
+      "summary": "calendar.app.created lets the agent create secondary calendars and manage events only on those. One developer reports the console lists it as non-sensitive, which would leave brand verification as the only review.",
+      "scopes": ["https://www.googleapis.com/auth/calendar.app.created"],
+      "gate": "light_review",
+      "gateName": "Google brand verification",
+      "todoIds": ["gcal_domain", "gcal_homepage", "gcal_privacy_policy", "gcal_privacy_calendar", "gcal_support", "gcal_logo", "gcal_terms", "gcal_cloud_project", "gcal_prod_scopes", "gcal_domain_verified", "gcal_callback", "gcal_brand", "gcal_switch_config"],
+      "customerApproval": {
+        "likelihood": "sometimes",
+        "who": "Customer's Google Workspace admin",
+        "detail": "Admins who block unconfigured third-party apps still block this one until trusted."
+      },
+      "evidence": {
+        "level": "reported",
+        "sourceIds": [0, 18, 6],
+        "note": "Scope meaning is official; non-sensitive status is a single community report. Confirm on Data Access before relying on it."
+      }
+    }
+  ],
+  "todos": [
+    {
+      "id": "gcal_domain",
+      "sharedId": "company_domain",
+      "title": "A domain you control",
+      "detail": "Hosts the homepage, privacy policy and OAuth callback; Google verifies it in Search Console. Reuse your Gmail domain.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Check DNS access and list which Google fields will point at this domain.",
+      "evidence": { "level": "sourced", "sourceIds": [6], "note": "Requirement is official; hours come from the shared vocabulary." }
+    },
+    {
+      "id": "gcal_homepage",
+      "sharedId": "homepage",
+      "title": "Public homepage that describes the app",
+      "detail": "Google checks it against the consent screen's homepage field; it must describe the app and not be login-only.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "agentHelp": "Draft homepage copy that names the Calendar features.",
+      "evidence": { "level": "sourced", "sourceIds": [6, 1], "note": "Hours are estimated." }
+    },
+    {
+      "id": "gcal_privacy_policy",
+      "sharedId": "privacy_policy",
+      "title": "Privacy policy page",
+      "detail": "Must sit on the homepage's domain and disclose how Google user data is accessed, used, stored and shared.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "agentHelp": "Draft the Google user data section with the Limited Use statement.",
+      "evidence": { "level": "sourced", "sourceIds": [1, 5], "note": "Hours are estimated." }
+    },
+    {
+      "id": "gcal_privacy_calendar",
+      "title": "Add Calendar data to the privacy policy",
+      "detail": "If the policy was written for Gmail, add what Calendar data you access, why, where it is stored and who receives it. Keep the URL unchanged, or brand verification is triggered again.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [0.25, 1],
+      "agentHelp": "Draft a Calendar paragraph matched to the scopes you request.",
+      "evidence": { "level": "sourced", "sourceIds": [1, 3], "note": "Disclosure requirement and the link-change rule are official; hours are estimated. A stalled Calendar review was stuck on privacy policy [17]." }
+    },
+    {
+      "id": "gcal_support",
+      "sharedId": "support_contact",
+      "title": "Support email or page",
+      "detail": "Branding requires a user support email shown on the consent screen.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Suggest a shared support address that is monitored.",
+      "evidence": { "level": "sourced", "sourceIds": [11], "note": "Hours are estimated." }
+    },
+    {
+      "id": "gcal_logo",
+      "sharedId": "app_logo",
+      "title": "App logo (square, high resolution)",
+      "detail": "Only needed if you want a logo on the consent screen; adding or changing it triggers brand verification.",
+      "owner": "you",
+      "kind": "prereq",
+      "optional": true,
+      "agentHelp": "Check the logo matches the app name and homepage branding.",
+      "evidence": { "level": "sourced", "sourceIds": [6, 3], "note": "Hours are estimated." }
+    },
+    {
+      "id": "gcal_terms",
+      "sharedId": "terms_of_service",
+      "title": "Terms of service page",
+      "detail": "Optional link on the Branding page.",
+      "owner": "agent_assist",
+      "kind": "prereq",
+      "optional": true,
+      "agentHelp": "Draft terms for legal review.",
+      "evidence": { "level": "unverified", "note": "Optionality not re-checked on an official page for this guide." }
+    },
+    {
+      "id": "gcal_cloud_project",
+      "sharedId": "google_cloud_project",
+      "title": "Google Cloud project with OAuth consent screen",
+      "detail": "Use the same production project as Gmail, so its brand verification and verified domains carry over.",
+      "owner": "you",
+      "kind": "prereq",
+      "agentHelp": "Identify the verified production project and its OAuth client.",
+      "evidence": { "level": "sourced", "sourceIds": [3, 15], "note": "That branding carries over unless changed is official; client reuse is from Composio. Hours are estimated." }
+    },
+    {
+      "id": "gcal_prod_scopes",
+      "title": "Enable the Calendar API and declare Calendar scopes in production",
+      "detail": "Enable calendar-json.googleapis.com in the production project and add only the Calendar scopes you need on Data Access. Do not request them from users until approved.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [0.1, 0.5],
+      "agentHelp": "Run 'gcloud services enable calendar-json.googleapis.com' and list the exact scope URLs to add.",
+      "url": "https://console.developers.google.com/auth/scopes",
+      "evidence": { "level": "sourced", "sourceIds": [4, 11], "note": "Hours are estimated." }
+    },
+    {
+      "id": "gcal_domain_verified",
+      "sharedId": "google_domain_verified",
+      "title": "Domains verified in Google Search Console",
+      "detail": "Every authorised domain, including your redirect URI's, must be verified by a project Owner or Editor. Already done if Gmail passed brand verification.",
+      "owner": "you",
+      "kind": "task",
+      "agentHelp": "Generate the DNS TXT record instructions.",
+      "url": "https://search.google.com/search-console",
+      "evidence": { "level": "sourced", "sourceIds": [6, 1], "note": "Hours and wait come from the shared vocabulary." }
+    },
+    {
+      "id": "gcal_callback",
+      "sharedId": "composio_custom_callback",
+      "title": "Composio callback on your own domain (white-label redirect)",
+      "detail": "Google verifies redirect-URI domains, so point the Google client at your own 302 proxy to Composio's callback. One proxy serves Gmail and Calendar.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "agentHelp": "Write the proxy endpoint and update both auth configs to use it.",
+      "evidence": { "level": "reported", "sourceIds": [6, 16], "note": "That Google rejects backend.composio.dev is our inference." }
+    },
+    {
+      "id": "gcal_brand",
+      "sharedId": "google_brand_verified",
+      "title": "Google brand verification",
+      "detail": "Needed once per project. Adding Calendar scopes does not redo it; changing name, logo, redirect URI, homepage or privacy policy link does.",
+      "owner": "you",
+      "kind": "review",
+      "agentHelp": "Pre-check every Branding URL is public and on a verified domain.",
+      "url": "https://console.developers.google.com/auth/branding",
+      "evidence": { "level": "sourced", "sourceIds": [6, 3], "note": "Wait comes from the shared vocabulary (Google: minutes, or 2-3 business days)." }
+    },
+    {
+      "id": "gcal_justification",
+      "title": "Write Calendar scope justifications and record the demo video",
+      "detail": "Explain per scope why a narrower one won't work, and record an English, end-to-end video of the consent screen showing the Calendar scopes and each scope in use, uploaded to YouTube as Unlisted.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "paperwork",
+      "hours": [2, 4],
+      "agentHelp": "Draft the justifications and a shot-by-shot video script; a human records it.",
+      "evidence": { "level": "sourced", "sourceIds": [1, 5], "note": "Requirements are official; hours are estimated." }
+    },
+    {
+      "id": "gcal_scope_review",
+      "title": "Pass sensitive scope verification for Calendar",
+      "detail": "Submit in the Verification Center and answer Trust & Safety emails quickly. No CASA for Calendar.",
+      "owner": "provider",
+      "kind": "review",
+      "tier": "paperwork",
+      "hours": [0.5, 1],
+      "waitDays": [5, 14],
+      "waitBasis": "official",
+      "agentHelp": "Draft replies to reviewer findings and track open checks.",
+      "evidence": { "level": "sourced", "sourceIds": [1, 2], "note": "Google: 3-5 business days [1] and 10 business days [2], not guaranteed. A community report describes a four-month stall [17]." }
+    },
+    {
+      "id": "gcal_switch_config",
+      "title": "Point production at the verified client and reconnect users",
+      "detail": "Create or update the Composio Calendar auth config with the verified client and proxy URL. Existing connections keep their old config until users reconnect.",
+      "owner": "agent_assist",
+      "kind": "task",
+      "tier": "basic",
+      "hours": [0.25, 1],
+      "agentHelp": "Update auth config ids in code and list connected accounts that need a reconnect prompt.",
+      "evidence": { "level": "unverified", "sourceIds": [16, 13], "note": "Composio documents updating the auth config; the reconnect behaviour is carried over from the Gmail guide." }
+    }
+  ]
+}
